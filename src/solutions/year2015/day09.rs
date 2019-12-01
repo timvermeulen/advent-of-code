@@ -3,8 +3,6 @@ use super::*;
 use permutohedron::Heap;
 
 fn parse(input: &str) -> Vec<Vec<u32>> {
-    use parser::prelude::*;
-
     let no_digit = satisfy(|c: char| !c.is_digit(10));
     let line = no_digit.skip_many().followed_by(parser::u32()).map(|(_, n)| n);
     let lines = line.collect_sep_by(token('\n'));

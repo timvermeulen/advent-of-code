@@ -56,8 +56,6 @@ impl Source {
 }
 
 fn parse(input: &str) -> HashMap<Wire, Source> {
-    use parser::prelude::*;
-
     let value = parser::u16();
     let wire = satisfy(char::is_alphabetic).skip_many1().recognize().map(str::to_string);
 

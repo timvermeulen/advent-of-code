@@ -1,7 +1,7 @@
 use super::*;
 
 fn parse(input: &str) -> Vec<u32> {
-    parser::u32().collect_sep_by(token('\n')).parse_to_end(&input).unwrap()
+    parser::u32().collect_sep_by(token('\n')).parse_to_end(input).unwrap()
 }
 
 fn part1(modules: &[u32]) -> u32 {

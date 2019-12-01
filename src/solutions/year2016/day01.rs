@@ -30,8 +30,6 @@ struct Instruction {
 }
 
 fn parse(input: &str) -> Vec<Instruction> {
-    use parser::prelude::*;
-
     let side = choice((token('L').map(|_| Side::Left), token('R').map(|_| Side::Right)));
 
     let instruction =
