@@ -157,10 +157,7 @@ fn parse(input: &str) -> [Wire; 2] {
 fn solve([wire_a, wire_b]: [&Wire; 2]) -> (i32, i32) {
     let mut vec = intersections(&wire_a.h_segments, &wire_b.v_segments);
     vec.extend(intersections(&wire_b.h_segments, &wire_a.v_segments));
-    (
-        vec.iter().map(|&(x, _)| x).min().unwrap(),
-        vec.iter().map(|&(_, x)| x).min().unwrap(),
-    )
+    (vec.iter().map(|&(x, _)| x).min().unwrap(), vec.iter().map(|&(_, x)| x).min().unwrap())
 }
 
 #[async_std::test]

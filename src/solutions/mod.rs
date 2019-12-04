@@ -3,7 +3,9 @@ use parser::prelude::*;
 use std::{
     cmp::{self, Ordering},
     collections::{BinaryHeap, HashMap, HashSet},
-    iter, mem,
+    hash::Hash,
+    iter::{self, FromIterator},
+    mem,
     ops::Range,
 };
 
