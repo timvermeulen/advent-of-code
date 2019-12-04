@@ -1,4 +1,4 @@
-const SESSION_TOKEN: &str = "53616c7465645f5fb9b8dd91912fc8faa4654c85300983528cf25e0512c1606df3d4ad41e95888c44d587250228a27bc";
+const SESSION_TOKEN: &str = env!("AOC_TOKEN");
 
 type SurfError = Box<dyn std::error::Error + Send + Sync>;
 type SurfResult<T> = Result<T, SurfError>;
