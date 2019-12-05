@@ -30,15 +30,13 @@ impl Reindeer {
     }
 }
 
-fn parse(input: &str) -> Vec<Reindeer> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Reindeer>> {
     parser::u32()
         .sep_by(rubbish(), |iter| {
             Some(Reindeer { speed: iter.next()?, fly: iter.next()?, rest: iter.next()? })
         })
         .between(rubbish(), rubbish())
         .collect_sep_by(token('\n'))
-        .parse_to_end(input)
-        .unwrap()
 }
 
 fn part1(reindeer: &[Reindeer]) -> u32 {
@@ -62,7 +60,7 @@ fn part2(reindeer: &[Reindeer]) -> u32 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 14).await?;
-    let reindeer = parse(&input);
+    let reindeer = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&reindeer), 2696);
     assert_eq!(part2(&reindeer), 1084);
     Ok(())

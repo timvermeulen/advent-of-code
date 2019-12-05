@@ -52,7 +52,7 @@ impl Token {
     }
 }
 
-fn parse(input: &str) -> Vec<Vec<Token>> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Vec<Token>>> {
     let hex_digit = satisfy_map(|c: char| c.to_digit(16));
     let word = satisfy(char::is_alphabetic).many1(|iter| Some(iter.count() as u32));
 
@@ -67,7 +67,7 @@ fn parse(input: &str) -> Vec<Vec<Token>> {
 
     let literal = tokens.between(token('\"'), token('\"'));
     let literals = literal.collect_sep_by(token('\n'));
-    literals.parse_to_end(input).unwrap()
+    literals
 }
 
 fn part1(tokens: &[Vec<Token>]) -> u32 {
@@ -81,7 +81,7 @@ fn part2(tokens: &[Vec<Token>]) -> u32 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 8).await?;
-    let tokens = parse(&input);
+    let tokens = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&tokens), 1333);
     assert_eq!(part2(&tokens), 2046);
     Ok(())

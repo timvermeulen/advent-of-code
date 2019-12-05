@@ -162,7 +162,7 @@ impl OrdCube {
     }
 }
 
-fn parse(input: &str) -> Vec<NanoBot> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<NanoBot>> {
     let position = parser::i32()
         .sep_by(token(','), |iter| {
             Some(Point { x: iter.next()?, y: iter.next()?, z: iter.next()? })
@@ -170,7 +170,7 @@ fn parse(input: &str) -> Vec<NanoBot> {
         .between(token('<'), token('>'));
     let bot = chain((string("pos="), position, string(", r="), parser::i32()))
         .map(|(_, position, _, radius)| NanoBot { position, radius });
-    bot.collect_sep_by(token('\n')).parse_to_end(input).unwrap()
+    bot.collect_sep_by(token('\n'))
 }
 
 fn part1(bots: &[NanoBot]) -> u32 {
@@ -211,7 +211,7 @@ fn part2(bots: &[NanoBot]) -> i32 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 23).await?;
-    let bots = parse(&input);
+    let bots = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&bots), 761);
     assert_eq!(part2(&bots), 89_915_526);
     Ok(())

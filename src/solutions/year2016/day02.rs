@@ -90,7 +90,7 @@ impl Direction {
     }
 }
 
-fn parse(input: &str) -> Vec<Vec<Direction>> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Vec<Direction>>> {
     let direction = choice((
         token('U').map(|_| Direction::Up),
         token('R').map(|_| Direction::Right),
@@ -99,7 +99,7 @@ fn parse(input: &str) -> Vec<Vec<Direction>> {
     ));
     let digit = direction.collect_many1();
     let digits = digit.collect_sep_by(token('\n'));
-    digits.parse_to_end(input).unwrap()
+    digits
 }
 
 fn part1(digits: &[Vec<Direction>]) -> String {
@@ -127,7 +127,7 @@ fn part2(digits: &[Vec<Direction>]) -> String {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2016, 2).await?;
-    let directions = parse(&input);
+    let directions = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&directions), "84452");
     assert_eq!(part2(&directions), "D65C3");
     Ok(())

@@ -4,10 +4,10 @@ fn is_triangle([x, y, z]: [u32; 3]) -> bool {
     x + y > z && y + z > x && z + x > y
 }
 
-fn parse(input: &str) -> Vec<[u32; 3]> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<[u32; 3]>> {
     let number = chain((token(' ').skip_many(), parser::u32())).map(|((), x)| x);
     let triple = chain((number, number, number)).map(|(x, y, z)| [x, y, z]);
-    triple.collect_sep_by(token('\n')).parse_to_end(input).expect("parsing failed")
+    triple.collect_sep_by(token('\n'))
 }
 
 fn part1(triples: &[[u32; 3]]) -> u32 {
@@ -27,7 +27,7 @@ fn part2(triples: &[[u32; 3]]) -> u32 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2016, 3).await?;
-    let triples = parse(&input);
+    let triples = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&triples), 982);
     assert_eq!(part2(&triples), 1826);
     Ok(())

@@ -5,11 +5,8 @@ enum Direction {
     Down,
 }
 
-fn parse(input: &str) -> Vec<Direction> {
-    choice((token('(').map(|_| Direction::Up), token(')').map(|_| Direction::Down)))
-        .collect_many()
-        .parse_to_end(input)
-        .unwrap()
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Direction>> {
+    choice((token('(').map(|_| Direction::Up), token(')').map(|_| Direction::Down))).collect_many()
 }
 
 fn part1(directions: &[Direction]) -> i32 {
@@ -40,7 +37,7 @@ fn part2(directions: &[Direction]) -> usize {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 1).await?;
-    let directions = parse(&input);
+    let directions = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&directions), 138);
     assert_eq!(part2(&directions), 1771);
     Ok(())

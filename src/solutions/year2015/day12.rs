@@ -62,22 +62,23 @@ fn object<'a>() -> impl Parser<&'a str, Output = Vec<(&'a str, JSON<'a>)>> {
         .between(token('{'), token('}'))
 }
 
-fn parse(input: &str) -> JSON<'_> {
-    json().parse_to_end(input).unwrap()
+fn parser<'a>() -> impl Parser<&'a str, Output = JSON<'a>> {
+    json()
 }
 
-fn part1(input: &str) -> i32 {
-    parse(input).sum()
+fn part1(json: &JSON<'_>) -> i32 {
+    json.sum()
 }
 
-fn part2(input: &str) -> i32 {
-    parse(input).non_red_sum()
+fn part2(json: &JSON<'_>) -> i32 {
+    json.non_red_sum()
 }
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 12).await?;
-    assert_eq!(part1(&input), 156_366);
-    assert_eq!(part2(&input), 96_852);
+    let json = parser().parse_to_end(&input).unwrap();
+    assert_eq!(part1(&json), 156_366);
+    assert_eq!(part2(&json), 96_852);
     Ok(())
 }

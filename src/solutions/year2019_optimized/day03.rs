@@ -102,7 +102,7 @@ fn intersections(h_segments: &[HSegment], v_segments: &[VSegment]) -> Vec<(i32, 
     intersections
 }
 
-fn parse(input: &str) -> [Wire; 2] {
+fn parser<'a>() -> impl Parser<&'a str, Output = [Wire; 2]> {
     let dir = choice((
         token('L').map(|_| Direction::Horizontal(HDirection::Left)),
         token('R').map(|_| Direction::Horizontal(HDirection::Right)),
@@ -151,7 +151,7 @@ fn parse(input: &str) -> [Wire; 2] {
         v_segments.sort_by_key(|s| s.x);
         Some(Wire { h_segments, v_segments })
     });
-    chain((wire, newline(), wire)).map(|(a, _, b)| [a, b]).parse_to_end(&input).unwrap()
+    chain((wire, newline(), wire)).map(|(a, _, b)| [a, b])
 }
 
 fn solve([wire_a, wire_b]: [&Wire; 2]) -> (i32, i32) {
@@ -163,7 +163,7 @@ fn solve([wire_a, wire_b]: [&Wire; 2]) -> (i32, i32) {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 3).await?;
-    let [wire_a, wire_b] = parse(&input);
+    let [wire_a, wire_b] = parser().parse_to_end(&input).unwrap();
     assert_eq!(solve([&wire_a, &wire_b]), (1983, 107_754));
     Ok(())
 }
@@ -179,7 +179,7 @@ mod benches {
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 3)).unwrap();
         b.iter(|| {
-            let [wire_a, wire_b] = parse(&input);
+            let [wire_a, wire_b] = parser().parse_to_end(&input).unwrap();
             solve([&wire_a, &wire_b])
         });
     }

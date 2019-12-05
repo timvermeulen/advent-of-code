@@ -29,13 +29,13 @@ struct Instruction {
     amount: i32,
 }
 
-fn parse(input: &str) -> Vec<Instruction> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Instruction>> {
     let side = choice((token('L').map(|_| Side::Left), token('R').map(|_| Side::Right)));
 
     let instruction =
         chain((side, parser::i32())).map(|(side, amount)| Instruction { side, amount });
 
-    instruction.collect_sep_by(string(", ")).parse_to_end(input).unwrap()
+    instruction.collect_sep_by(string(", "))
 }
 
 fn part1(instructions: &[Instruction]) -> i32 {
@@ -86,7 +86,7 @@ fn part2(instructions: &[Instruction]) -> i32 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2016, 1).await?;
-    let instructions = parse(&input);
+    let instructions = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&instructions), 278);
     assert_eq!(part2(&instructions), 161);
     Ok(())

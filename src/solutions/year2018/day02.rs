@@ -1,8 +1,7 @@
 use super::*;
 
-fn parse(input: &str) -> Vec<&str> {
-    let id = satisfy::<_, &str>(char::is_alphabetic).skip_many1().recognize();
-    id.collect_sep_by(token('\n')).parse_to_end(&input).unwrap()
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<&'a str>> {
+    satisfy(char::is_alphabetic).skip_many1().recognize().collect_sep_by(token('\n'))
 }
 
 fn part1(ids: &[&str]) -> u32 {
@@ -35,7 +34,7 @@ fn part2(ids: &[&str]) -> String {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 2).await?;
-    let ids = parse(&input);
+    let ids = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&ids), 7163);
     assert_eq!(part2(&ids), "ighfbyijnoumxjlxevacpwqtr");
     Ok(())

@@ -55,7 +55,7 @@ impl Source {
     }
 }
 
-fn parse(input: &str) -> HashMap<Wire, Source> {
+fn parser<'a>() -> impl Parser<&'a str, Output = HashMap<Wire, Source>> {
     let value = parser::u16();
     let wire = satisfy(char::is_alphabetic).skip_many1().recognize().map(str::to_string);
 
@@ -72,7 +72,7 @@ fn parse(input: &str) -> HashMap<Wire, Source> {
     let source = gate.map(Source::Gate).or(s.map(Source::SingleSource));
     let instruction = chain((source, string(" -> "), wire)).map(|(s, _, w)| (w, s));
 
-    instruction.collect_sep_by(token('\n')).parse_to_end(input).unwrap()
+    instruction.collect_sep_by(token('\n'))
 }
 
 fn part1(instructions: &HashMap<Wire, Source>) -> Value {
@@ -95,7 +95,7 @@ fn part2(instructions: &HashMap<Wire, Source>) -> Value {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 7).await?;
-    let instructions = parse(&input);
+    let instructions = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&instructions), 46_065);
     assert_eq!(part2(&instructions), 14_134);
     Ok(())

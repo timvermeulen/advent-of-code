@@ -44,11 +44,8 @@ fn combinations(n: u32, k: u32) -> u32 {
     }
 }
 
-fn parse(input: &str) -> Range<u32> {
-    chain((parser::u32(), token('-'), parser::u32()))
-        .map(|(a, _, b)| a..b)
-        .parse_to_end(input)
-        .unwrap()
+fn parser<'a>() -> impl Parser<&'a str, Output = Range<u32>> {
+    chain((parser::u32(), token('-'), parser::u32())).map(|(a, _, b)| a..b)
 }
 
 fn part1(range: Range<u32>) -> u32 {
@@ -58,7 +55,7 @@ fn part1(range: Range<u32>) -> u32 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 4).await?;
-    let range = parse(&input);
+    let range = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(range), 1767);
     Ok(())
 }
@@ -74,7 +71,7 @@ mod benches {
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 4)).unwrap();
         b.iter(|| {
-            let range = parse(&input);
+            let range = parser().parse_to_end(&input).unwrap();
             part1(range)
         });
     }

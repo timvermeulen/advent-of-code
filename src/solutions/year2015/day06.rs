@@ -14,7 +14,7 @@ struct Instruction {
     end: (usize, usize),
 }
 
-fn parse(input: &str) -> Vec<Instruction> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Instruction>> {
     let coordinates =
         chain((parser::u32(), token(','), parser::u32())).map(|(a, _, b)| (a as usize, b as usize));
 
@@ -27,7 +27,7 @@ fn parse(input: &str) -> Vec<Instruction> {
     let instruction = chain((action, token(' '), coordinates, string(" through "), coordinates))
         .map(|(action, _, start, _, end)| Instruction { action, start, end });
 
-    instruction.collect_sep_by(token('\n')).parse_to_end(input).unwrap()
+    instruction.collect_sep_by(token('\n'))
 }
 
 const SIZE: usize = 1000;
@@ -76,7 +76,7 @@ fn part2(instructions: &[Instruction]) -> usize {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 6).await?;
-    let instructions = parse(&input);
+    let instructions = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&instructions), 569_999);
     assert_eq!(part2(&instructions), 17_836_115);
     Ok(())

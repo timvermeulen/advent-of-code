@@ -12,14 +12,14 @@ struct Sue<'a> {
     items: [Item<'a>; 3],
 }
 
-fn parse(input: &str) -> Vec<Sue<'_>> {
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Sue<'a>>> {
     let item =
         chain((satisfy(char::is_alphabetic).skip_many1().recognize(), string(": "), parser::u32()))
             .map(|(name, _, count)| Item { name, count });
     let items = item.sep_by(string(", "), |iter| Some([iter.next()?, iter.next()?, iter.next()?]));
     let sue = chain((string("Sue "), parser::u32(), string(": "), items))
         .map(|(_, number, _, items)| Sue { number, items });
-    sue.collect_sep_by(token('\n')).parse_to_end(input).unwrap()
+    sue.collect_sep_by(token('\n'))
 }
 
 fn part1(sues: &[Sue<'_>]) -> u32 {
@@ -66,7 +66,7 @@ fn is_match_2(item: Item<'_>) -> bool {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 16).await?;
-    let sues = parse(&input);
+    let sues = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&sues), 373);
     assert_eq!(part2(&sues), 260);
     Ok(())

@@ -1,10 +1,7 @@
 use super::*;
 
-fn parse(input: &str) -> Range<u32> {
-    chain((parser::u32(), token('-'), parser::u32()))
-        .map(|(a, _, b)| a..b)
-        .parse_to_end(input)
-        .unwrap()
+fn parser<'a>() -> impl Parser<&'a str, Output = Range<u32>> {
+    chain((parser::u32(), token('-'), parser::u32())).map(|(a, _, b)| a..b)
 }
 
 fn digits(n: u32) -> [u32; 6] {
@@ -35,7 +32,7 @@ fn part2(range: Range<u32>) -> usize {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 4).await?;
-    let range = parse(&input);
+    let range = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(range.clone()), 1767);
     assert_eq!(part2(range), 1192);
     Ok(())
@@ -51,14 +48,14 @@ mod benches {
     #[bench]
     fn bench_part1(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 4)).unwrap();
-        let range = parse(&input);
+        let range = parser().parse_to_end(&input).unwrap();
         b.iter(|| part1(range.clone()));
     }
 
     #[bench]
     fn bench_part2(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 4)).unwrap();
-        let range = parse(&input);
+        let range = parser().parse_to_end(&input).unwrap();
         b.iter(|| part2(range.clone()));
     }
 }

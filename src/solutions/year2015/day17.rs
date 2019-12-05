@@ -1,7 +1,7 @@
 use super::*;
 
-fn parse(input: &str) -> Vec<u32> {
-    parser::u32().collect_sep_by(token('\n')).parse_to_end(input).unwrap()
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<u32>> {
+    parser::u32().collect_sep_by(token('\n'))
 }
 
 fn part1(containers: &[u32]) -> u32 {
@@ -66,7 +66,7 @@ fn count2(containers: &[u32], liters: u32) -> Option<(u32, u32)> {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 17).await?;
-    let containers = parse(&input);
+    let containers = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&containers), 654);
     assert_eq!(part2(&containers), 57);
     Ok(())

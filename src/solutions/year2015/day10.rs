@@ -2,8 +2,8 @@ use super::*;
 use itertools::Itertools;
 use std::iter::once;
 
-fn parse(input: &str) -> Vec<u8> {
-    input.chars().map(|c| c.to_digit(10).unwrap() as u8).collect()
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<u8>> {
+    parser::digit().map(|d| d as u8).collect_many()
 }
 
 fn look_and_say(slice: &[u8]) -> Vec<u8> {
@@ -40,7 +40,7 @@ fn test_example() {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 10).await?;
-    let digits = parse(&input);
+    let digits = parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&digits), 360_154);
     assert_eq!(part2(&digits), 5_103_798);
     Ok(())
