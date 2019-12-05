@@ -7,7 +7,7 @@ edition = "2018"
 [dependencies]
 surf = "1.0.3"
 async-std = { version = "1.2.0", features = ["attributes"] }
-parser = { git = "https://github.com/timvermeulen/Parse" }
+parser = { git = "https://github.com/timvermeulen/parser" }
 futures = "0.3.1"
 rust-crypto = "0.2.36"
 permutohedron = "0.2.4"
