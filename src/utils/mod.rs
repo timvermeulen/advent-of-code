@@ -2,6 +2,8 @@ mod cache;
 mod digits;
 mod useful_parsers;
 
+pub mod intcode;
+
 pub use cache::*;
 pub use digits::*;
 pub use useful_parsers::*;
