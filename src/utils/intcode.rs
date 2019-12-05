@@ -1,26 +1,26 @@
-pub struct State<I, O> {
-    pub data: Vec<i32>,
+pub struct Computer<I, O> {
+    pub memory: Vec<i32>,
     pub pc: i32,
     input: I,
     output: O,
 }
 
-impl<I, O> State<I, O>
+impl<I, O> Computer<I, O>
 where
     I: FnMut() -> i32,
     O: FnMut(i32),
 {
-    pub fn new(data: Vec<i32>, input: I, output: O) -> Self {
-        Self { data, pc: 0, input, output }
+    pub fn new(memory: Vec<i32>, input: I, output: O) -> Self {
+        Self { memory, pc: 0, input, output }
     }
 
     pub fn run(&mut self) {
         loop {
-            let instruction = self.data[self.pc as usize];
+            let instruction = self.memory[self.pc as usize];
             self.pc += 1;
             let opcode = Opcode::new(instruction % 100);
-            let parameter_modes = ParameterModes { n: instruction / 100 };
-            let mut handle = Handle { state: self, parameter_modes };
+            let modes = ParameterModes { n: instruction / 100 };
+            let mut handle = Handle { comp: self, modes };
             match opcode.operate(&mut handle) {
                 Action::Continue => {}
                 Action::Output(x) => (self.output)(x),
@@ -30,22 +30,22 @@ where
     }
 
     fn read(&mut self, mode: ParameterMode) -> i32 {
-        let value = self.data[self.pc as usize];
+        let value = self.memory[self.pc as usize];
         self.pc += 1;
         match mode {
-            ParameterMode::Position => self.data[value as usize],
+            ParameterMode::Position => self.memory[value as usize],
             ParameterMode::Immediate => value,
         }
     }
 
     fn write(&mut self, value: i32) {
         let address = self.read(ParameterMode::Immediate);
-        self.data[address as usize] = value;
+        self.memory[address as usize] = value;
     }
 
     fn write_input(&mut self) {
         let input = (self.input)();
-        self.write(input)
+        self.write(input);
     }
 
     fn jump_to(&mut self, address: i32) {
@@ -54,8 +54,8 @@ where
 }
 
 struct Handle<'a, I, O> {
-    state: &'a mut State<I, O>,
-    parameter_modes: ParameterModes,
+    comp: &'a mut Computer<I, O>,
+    modes: ParameterModes,
 }
 
 impl<I, O> Handle<'_, I, O>
@@ -64,19 +64,19 @@ where
     O: FnMut(i32),
 {
     fn read(&mut self) -> i32 {
-        self.state.read(self.parameter_modes.next())
+        self.comp.read(self.modes.next())
     }
 
     fn write(&mut self, value: i32) {
-        self.state.write(value)
+        self.comp.write(value);
     }
 
     fn write_input(&mut self) {
-        self.state.write_input()
+        self.comp.write_input();
     }
 
     fn jump_to(&mut self, address: i32) {
-        self.state.jump_to(address)
+        self.comp.jump_to(address);
     }
 }
 
