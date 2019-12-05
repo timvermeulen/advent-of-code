@@ -37,7 +37,6 @@ impl Opcode {
 fn run(mut nums: Vec<usize>, noun: usize, verb: usize) -> usize {
     nums[1] = noun;
     nums[2] = verb;
-    let mut address = 0;
 
     for address in (0..).step_by(4) {
         match Opcode::new(nums[address]) {
