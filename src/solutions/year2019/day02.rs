@@ -7,17 +7,13 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i32>> {
 fn run(mut memory: Vec<i32>, noun: i32, verb: i32) -> i32 {
     memory[1] = noun;
     memory[2] = verb;
-    let mut state = intcode::Computer::new(
-        memory,
-        || panic!("unexpected input opcode"),
-        |_| panic!("unexpected output opcode"),
-    );
-    state.run();
-    state.memory[0]
+    let mut computer = intcode::Computer::new(memory);
+    computer.run();
+    computer.memory[0]
 }
 
-fn part1(data: Vec<i32>) -> i32 {
-    run(data, 12, 2)
+fn part1(memory: Vec<i32>) -> i32 {
+    run(memory, 12, 2)
 }
 
 fn part2(memory: Vec<i32>) -> i32 {
