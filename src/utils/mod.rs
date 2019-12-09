@@ -23,3 +23,12 @@ pub trait IteratorExt: Iterator + Sized {
 }
 
 impl<I: Iterator + Sized> IteratorExt for I {}
+
+#[macro_export]
+macro_rules! iter {
+    ($x:expr) => {
+        std::array::IntoIter::new($x)
+    };
+}
+
+pub use iter;

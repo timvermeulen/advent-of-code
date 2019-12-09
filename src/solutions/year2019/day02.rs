@@ -1,10 +1,10 @@
 use super::*;
 
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i32>> {
-    parser::i32().collect_sep_by(comma())
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
+    parser::i64().collect_sep_by(comma())
 }
 
-fn run(mut memory: Vec<i32>, noun: i32, verb: i32) -> i32 {
+fn run(mut memory: Vec<i64>, noun: i64, verb: i64) -> i64 {
     memory[1] = noun;
     memory[2] = verb;
     let mut computer = intcode::Computer::new(memory);
@@ -12,11 +12,11 @@ fn run(mut memory: Vec<i32>, noun: i32, verb: i32) -> i32 {
     computer.memory[0]
 }
 
-fn part1(memory: Vec<i32>) -> i32 {
+fn part1(memory: Vec<i64>) -> i64 {
     run(memory, 12, 2)
 }
 
-fn part2(memory: Vec<i32>) -> i32 {
+fn part2(memory: Vec<i64>) -> i64 {
     for noun in 0..100 {
         for verb in 0..100 {
             if run(memory.clone(), noun, verb) == 19_690_720 {

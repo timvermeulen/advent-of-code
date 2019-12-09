@@ -1,11 +1,11 @@
 use super::*;
 use intcode::*;
 
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i32>> {
-    parser::i32().collect_sep_by(comma())
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
+    parser::i64().collect_sep_by(comma())
 }
 
-fn run(memory: Vec<i32>, input: i32) -> i32 {
+fn run(memory: Vec<i64>, input: i64) -> i64 {
     let mut i = None;
     let mut o = None;
     let mut computer = Computer::new(memory);
@@ -18,11 +18,11 @@ fn run(memory: Vec<i32>, input: i32) -> i32 {
     }
 }
 
-fn part1(memory: Vec<i32>) -> i32 {
+fn part1(memory: Vec<i64>) -> i64 {
     run(memory, 1)
 }
 
-fn part2(memory: Vec<i32>) -> i32 {
+fn part2(memory: Vec<i64>) -> i64 {
     run(memory, 5)
 }
 

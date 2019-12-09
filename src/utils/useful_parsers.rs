@@ -11,3 +11,11 @@ pub fn newline<'a>() -> impl Parser<&'a str, Output = ()> + Copy + Clone {
 pub fn comma<'a>() -> impl Parser<&'a str, Output = ()> + Copy + Clone {
     token(',').map(|_| ())
 }
+
+pub fn alphabetic<'a>() -> impl Parser<&'a str, Output = char> + Copy + Clone {
+    satisfy(char::is_alphabetic)
+}
+
+pub fn alphanumeric<'a>() -> impl Parser<&'a str, Output = char> + Copy + Clone {
+    satisfy(char::is_alphanumeric)
+}

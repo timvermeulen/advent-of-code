@@ -2,11 +2,11 @@ use super::*;
 use intcode::*;
 use permutohedron::Heap;
 
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i32>> {
-    parser::i32().collect_sep_by(comma())
+fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
+    parser::i64().collect_sep_by(comma())
 }
 
-fn part1(memory: &[i32]) -> i32 {
+fn part1(memory: &[i64]) -> i64 {
     let mut settings = [0, 1, 2, 3, 4];
     let mut heap = Heap::new(&mut settings);
     let iter = iter::from_fn(|| {
@@ -16,7 +16,7 @@ fn part1(memory: &[i32]) -> i32 {
     iter.map(|settings| run_part1(memory, settings)).max().unwrap()
 }
 
-fn run_part1(memory: &[i32], settings: [i32; 5]) -> i32 {
+fn run_part1(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amp = || Computer::new(memory.to_owned());
     let mut amps = [amp(), amp(), amp(), amp(), amp()];
     iter!(amps).zip(&settings).fold(0, |input, (mut amp, &setting)| {
@@ -26,7 +26,7 @@ fn run_part1(memory: &[i32], settings: [i32; 5]) -> i32 {
     })
 }
 
-fn part2(memory: &[i32]) -> i32 {
+fn part2(memory: &[i64]) -> i64 {
     let mut settings = [5, 6, 7, 8, 9];
     let mut heap = Heap::new(&mut settings);
     let iter = iter::from_fn(|| {
@@ -36,7 +36,7 @@ fn part2(memory: &[i32]) -> i32 {
     iter.map(|settings| run_part2(memory, settings)).max().unwrap()
 }
 
-fn run_part2(memory: &[i32], settings: [i32; 5]) -> i32 {
+fn run_part2(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amp = || Computer::new(memory.to_owned());
     let mut amps = [amp(), amp(), amp(), amp(), amp()];
 

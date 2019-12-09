@@ -1,11 +1,14 @@
+use std::convert::TryFrom;
+
 pub struct Computer {
-    pub memory: Vec<i32>,
-    pub pc: i32,
+    pub memory: Vec<i64>,
+    pub pc: i64,
+    pub base: i64,
 }
 
 impl Computer {
-    pub fn new(memory: Vec<i32>) -> Self {
-        Self { memory, pc: 0 }
+    pub fn new(memory: Vec<i64>) -> Self {
+        Self { memory, pc: 0, base: 0 }
     }
 
     pub fn run(&mut self) -> State {
@@ -16,38 +19,44 @@ impl Computer {
             let modes = ParamModes { n: instruction / 100 };
             let mut handle = Params { comp: self, modes };
             if let Some(state) = opcode.operate(&mut handle) {
-                match state {
-                    State::WaitingForInput => return State::WaitingForInput,
-                    State::Output(x) => return State::Output(x),
-                    State::Halt => return State::Halt,
-                }
+                return state;
             }
         }
     }
 
-    pub fn run_with_input(&mut self, input: Option<i32>) -> State {
+    pub fn run_with_input(&mut self, input: Option<i64>) -> State {
         if let Some(input) = input {
-            self.write(input);
+            let mode = ParamMode::new(self.memory[self.pc as usize - 1] / 100);
+            self.write(input, mode);
         }
         self.run()
     }
 
-    pub fn read(&mut self, mode: ParamMode) -> i32 {
+    pub fn read(&mut self, mode: ParamMode) -> i64 {
         let value = self.memory[self.pc as usize];
         self.pc += 1;
-        match mode {
-            ParamMode::Position => self.memory[value as usize],
-            ParamMode::Immediate => value,
-        }
+        let address = match mode {
+            ParamMode::Position => value,
+            ParamMode::Immediate => return value,
+            ParamMode::Relative => self.base + value,
+        } as usize;
+        self.memory.get(address).copied().unwrap_or(0)
     }
 
-    pub fn write(&mut self, value: i32) {
+    pub fn write(&mut self, value: i64, mode: ParamMode) {
         let address = self.read(ParamMode::Immediate);
-        self.memory[address as usize] = value;
-    }
 
-    pub fn jump_to(&mut self, address: i32) {
-        self.pc = address;
+        let address = match mode {
+            ParamMode::Position => address,
+            ParamMode::Immediate => panic!("writing cannot happen in immediate mode"),
+            ParamMode::Relative => address + self.base,
+        } as usize;
+
+        if address as usize >= self.memory.len() {
+            self.memory.extend(std::iter::repeat(0).take(address as usize - self.memory.len() + 1));
+        }
+
+        self.memory[address as usize] = value;
     }
 }
 
@@ -57,16 +66,21 @@ struct Params<'a> {
 }
 
 impl Params<'_> {
-    fn read(&mut self) -> i32 {
+    fn read(&mut self) -> i64 {
         self.comp.read(self.modes.next())
     }
 
-    fn write(&mut self, value: i32) {
-        self.comp.write(value);
+    fn write(&mut self, value: i64) {
+        let mode = self.modes.next();
+        self.comp.write(value, mode);
     }
 
-    fn jump_to(&mut self, address: i32) {
-        self.comp.jump_to(address);
+    fn jump_to(&mut self, address: i64) {
+        self.comp.pc = address;
+    }
+
+    fn adjust_by(&mut self, offset: i64) {
+        self.comp.base += offset;
     }
 }
 
@@ -81,10 +95,11 @@ enum Opcode {
     LessThan,
     EqualTo,
     Halt,
+    Adjust,
 }
 
 impl Opcode {
-    fn new(opcode: i32) -> Self {
+    fn new(opcode: i64) -> Self {
         match opcode {
             1 => Self::Add,
             2 => Self::Multiply,
@@ -94,6 +109,7 @@ impl Opcode {
             6 => Self::JumpFalse,
             7 => Self::LessThan,
             8 => Self::EqualTo,
+            9 => Self::Adjust,
             99 => Self::Halt,
             _ => panic!("invalid opcode: {}", opcode),
         }
@@ -109,7 +125,9 @@ impl Opcode {
                 let product = params.read() * params.read();
                 params.write(product);
             }
-            Self::Input => return Some(State::WaitingForInput),
+            Self::Input => {
+                return Some(State::WaitingForInput);
+            }
             Self::Output => return Some(State::Output(params.read())),
             Self::JumpTrue => {
                 let condition = params.read() != 0;
@@ -135,34 +153,57 @@ impl Opcode {
                 let second = params.read();
                 params.write(if first == second { 1 } else { 0 });
             }
+            Self::Adjust => {
+                let offset = params.read();
+                params.adjust_by(offset);
+            }
             Self::Halt => return Some(State::Halt),
         }
         None
     }
 }
 
+#[derive(Debug)]
 pub enum State {
     Halt,
     WaitingForInput,
-    Output(i32),
+    Output(i64),
 }
 
+impl State {
+    pub fn output(self) -> Option<i64> {
+        match self {
+            Self::Halt | Self::WaitingForInput => None,
+            Self::Output(output) => Some(output),
+        }
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
 pub enum ParamMode {
     Position,
     Immediate,
+    Relative,
+}
+
+impl ParamMode {
+    fn new(n: i64) -> Self {
+        match n {
+            0 => Self::Position,
+            1 => Self::Immediate,
+            2 => Self::Relative,
+            k => panic!("invalid parameter mode: {}", k),
+        }
+    }
 }
 
 struct ParamModes {
-    n: i32,
+    n: i64,
 }
 
 impl ParamModes {
     fn next(&mut self) -> ParamMode {
-        let mode = match self.n % 10 {
-            0 => ParamMode::Position,
-            1 => ParamMode::Immediate,
-            k => panic!("invalid parameter mode: {}", k),
-        };
+        let mode = ParamMode::new(self.n % 10);
         self.n /= 10;
         mode
     }
