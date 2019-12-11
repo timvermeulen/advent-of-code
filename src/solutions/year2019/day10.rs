@@ -1,5 +1,6 @@
 use super::*;
 use noisy_float::prelude::*;
+use num::integer::gcd;
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
 struct Point {
@@ -49,26 +50,11 @@ fn parse(input: &str) -> Asteroids {
     asteroids
 }
 
-fn gcd(x: i32, y: i32) -> i32 {
-    let mut x = x.abs();
-    let mut y = y.abs();
-    while y != 0 {
-        let r = x % y;
-        x = y;
-        y = r;
-    }
-    x
-}
-
 fn part1(asteroids: &Asteroids) -> (Point, usize) {
-    let mut gcd: Vec<i32> = (0..asteroids.side_len)
-        .flat_map(|y| (0..asteroids.side_len).map(move |x| gcd(x as i32, y as i32)))
-        .collect();
-
     let points_between = |p0: Point, p1: Point| {
         let dx = p1.x - p0.x;
         let dy = p1.y - p0.y;
-        let steps = gcd[dx.abs() as usize + dy.abs() as usize * asteroids.side_len];
+        let steps = gcd(dx.abs(), dy.abs());
         (1..steps).map(move |k| Point { x: p0.x + k * dx / steps, y: p0.y + k * dy / steps })
     };
 

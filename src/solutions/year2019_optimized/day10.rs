@@ -29,12 +29,6 @@ impl Asteroids {
         self.vec.push(point);
         self.grid[point.x as usize + self.side_len * point.y as usize] = true;
     }
-
-    fn remove(&mut self, point: Point) {
-        let index = self.vec.iter().position(|&p| p == point).unwrap();
-        self.vec.swap_remove(index);
-        self.grid[point.x as usize + self.side_len * point.y as usize] = false;
-    }
 }
 
 struct Grid<T> {
@@ -134,12 +128,51 @@ fn part1(asteroids: &Asteroids) -> (Point, usize) {
         .unwrap()
 }
 
+fn area(Point { x, y }: Point) -> u32 {
+    match (x.signum(), y.signum()) {
+        (0, -1) => 0,
+        (1, -1) => 1,
+        (1, 0) => 2,
+        (1, 1) => 3,
+        (0, 1) => 4,
+        (-1, 1) => 5,
+        (-1, 0) => 6,
+        (-1, -1) => 7,
+        (0, 0) => 8,
+        _ => unreachable!(),
+    }
+}
+
+fn part2(asteroids: &Asteroids, laser: Point) -> i32 {
+    let points_between = |p0: Point, p1: Point| {
+        let dx = p1.x - p0.x;
+        let dy = p1.y - p0.y;
+        let steps = gcd(dx.abs(), dy.abs());
+        (1..steps).map(move |k| Point { x: p0.x + k * dx / steps, y: p0.y + k * dy / steps })
+    };
+
+    let is_visible = |p0, p1| p0 != p1 && points_between(p0, p1).all(|p| !asteroids.contains(p));
+    let mut visible: Vec<_> = asteroids.iter().filter(|&p| is_visible(laser, p)).collect();
+    visible.sort_by(|p0, p1| {
+        let x0 = p0.x - laser.x;
+        let y0 = p0.y - laser.y;
+        let x1 = p1.x - laser.x;
+        let y1 = p1.y - laser.y;
+        let lhs = (area(Point { x: x0, y: y0 }), x1 * y0);
+        let rhs = (area(Point { x: x1, y: y1 }), x0 * y1);
+        lhs.cmp(&rhs)
+    });
+    let asteroid = visible[199];
+    100 * asteroid.x + asteroid.y
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 10).await?;
     let asteroids = parse(&input);
-    let (_, count) = part1(&asteroids);
+    let (laser, count) = part1(&asteroids);
     assert_eq!(count, 278);
+    assert_eq!(part2(&asteroids, laser), 1417);
     Ok(())
 }
 
@@ -151,17 +184,30 @@ mod benches {
     use test::Bencher;
 
     #[bench]
-    fn bench(b: &mut Bencher) {
+    fn bench_part1(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 10)).unwrap();
         b.iter(|| {
             let asteroids = parse(&input);
-            part1(&asteroids)
+            let (_, count) = part1(&asteroids);
+            count
         });
     }
 
     #[bench]
-    fn bench_parse(b: &mut Bencher) {
+    fn bench_part2(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 10)).unwrap();
-        b.iter(|| parse(&input));
+        let asteroids = parse(&input);
+        let (laser, _) = part1(&asteroids);
+        b.iter(|| part2(&asteroids, laser));
+    }
+
+    #[bench]
+    fn bench_both(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 10)).unwrap();
+        b.iter(|| {
+            let asteroids = parse(&input);
+            let (laser, count) = part1(&asteroids);
+            (count, part2(&asteroids, laser))
+        });
     }
 }
