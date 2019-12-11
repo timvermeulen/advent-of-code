@@ -9,3 +9,4 @@ mod day06;
 mod day07;
 mod day08;
 mod day09;
+mod day10;
