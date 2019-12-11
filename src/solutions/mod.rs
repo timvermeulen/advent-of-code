@@ -7,7 +7,7 @@ use std::{
     hash::Hash,
     iter::{self, successors, FromIterator},
     mem,
-    ops::Range,
+    ops::{Index, IndexMut, Range},
 };
 
 mod year2015;
