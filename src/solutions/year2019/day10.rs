@@ -1,6 +1,5 @@
 use super::*;
 use noisy_float::prelude::*;
-use num::integer::gcd;
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
 struct Point {
