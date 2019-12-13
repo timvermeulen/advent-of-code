@@ -6,16 +6,8 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
 }
 
 fn run(memory: Vec<i64>, input: i64) -> i64 {
-    let mut i = None;
-    let mut o = None;
     let mut computer = Computer::new(memory);
-    loop {
-        match computer.run_with_input(i.take()) {
-            State::Halt => return o.unwrap(),
-            State::WaitingForInput => i = Some(input),
-            State::Output(output) => o = Some(output),
-        }
-    }
+    iter::from_fn(|| computer.run_with(iter::once(input)).output()).last().unwrap()
 }
 
 fn part1(memory: Vec<i64>) -> i64 {

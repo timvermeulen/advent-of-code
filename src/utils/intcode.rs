@@ -4,32 +4,48 @@ pub struct Computer {
     pub memory: Vec<i64>,
     pub pc: i64,
     pub base: i64,
+    pub expects_input: bool,
 }
 
 impl Computer {
     pub fn new(memory: Vec<i64>) -> Self {
-        Self { memory, pc: 0, base: 0 }
+        Self { memory, pc: 0, base: 0, expects_input: false }
     }
 
     pub fn run(&mut self) -> State {
-        loop {
-            let instruction = self.memory[self.pc as usize];
-            self.pc += 1;
-            let opcode = Opcode::new(instruction % 100);
-            let modes = ParamModes { n: instruction / 100 };
-            let mut handle = Params { comp: self, modes };
-            if let Some(state) = opcode.operate(&mut handle) {
-                return state;
-            }
-        }
+        self.run_with(std::iter::empty())
     }
 
-    pub fn run_with_input(&mut self, input: Option<i64>) -> State {
-        if let Some(input) = input {
-            let mode = ParamMode::new(self.memory[self.pc as usize - 1] / 100);
-            self.write(input, mode);
+    pub fn run_with(&mut self, input: impl IntoIterator<Item = i64>) -> State {
+        let mut iter = input.into_iter();
+
+        loop {
+            if self.expects_input {
+                let input = match iter.next() {
+                    None => return State::WaitingForInput,
+                    Some(input) => input,
+                };
+                self.expects_input = false;
+                let mode = ParamMode::new(self.memory[self.pc as usize - 1] / 100);
+                self.write(input, mode);
+            }
+
+            loop {
+                let instruction = self.memory[self.pc as usize];
+                self.pc += 1;
+                let opcode = Opcode::new(instruction % 100);
+                let modes = ParamModes { n: instruction / 100 };
+                let mut handle = Params { comp: self, modes };
+
+                if let Some(state) = opcode.operate(&mut handle) {
+                    match state {
+                        State::Halt => return State::Halt,
+                        State::WaitingForInput => break,
+                        State::Output(output) => return State::Output(output),
+                    }
+                }
+            }
         }
-        self.run()
     }
 
     pub fn read(&mut self, mode: ParamMode) -> i64 {
@@ -82,6 +98,10 @@ impl Params<'_> {
     fn adjust_by(&mut self, offset: i64) {
         self.comp.base += offset;
     }
+
+    fn expect_input(&mut self) {
+        self.comp.expects_input = true;
+    }
 }
 
 #[derive(Debug)]
@@ -126,6 +146,7 @@ impl Opcode {
                 params.write(product);
             }
             Self::Input => {
+                params.expect_input();
                 return Some(State::WaitingForInput);
             }
             Self::Output => return Some(State::Output(params.read())),
@@ -163,7 +184,7 @@ impl Opcode {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub enum State {
     Halt,
     WaitingForInput,
@@ -175,6 +196,24 @@ impl State {
         match self {
             Self::Halt | Self::WaitingForInput => None,
             Self::Output(output) => Some(output),
+        }
+    }
+
+    pub fn unwrap(self) -> i64 {
+        self.output().unwrap()
+    }
+
+    pub fn is_halt(self) -> bool {
+        match self {
+            Self::Halt => true,
+            Self::WaitingForInput | Self::Output(_) => false,
+        }
+    }
+
+    pub fn needs_input(self) -> bool {
+        match self {
+            Self::Halt | Self::Output(_) => false,
+            Self::WaitingForInput => true,
         }
     }
 }

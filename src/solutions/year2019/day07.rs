@@ -19,11 +19,9 @@ fn part1(memory: &[i64]) -> i64 {
 fn run_part1(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amp = || Computer::new(memory.to_owned());
     let mut amps = [amp(), amp(), amp(), amp(), amp()];
-    iter!(amps).zip(&settings).fold(0, |input, (mut amp, &setting)| {
-        amp.run();
-        amp.run_with_input(Some(setting));
-        amp.run_with_input(Some(input)).output().unwrap()
-    })
+    iter!(amps)
+        .zip(&settings)
+        .fold(0, |input, (mut amp, &setting)| amp.run_with(iter!([setting, input])).unwrap())
 }
 
 fn part2(memory: &[i64]) -> i64 {
@@ -39,18 +37,13 @@ fn part2(memory: &[i64]) -> i64 {
 fn run_part2(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amp = || Computer::new(memory.to_owned());
     let mut amps = [amp(), amp(), amp(), amp(), amp()];
-
-    for i in 0..5 {
-        amps[i].run();
-        amps[i].run_with_input(Some(settings[i]));
-    }
+    let mut settings = settings.iter().copied();
 
     let mut value = 0;
-
     loop {
         let mut halted = false;
         for amp in &mut amps {
-            value = amp.run_with_input(Some(value)).output().unwrap();
+            value = amp.run_with(settings.next().into_iter().chain(iter::once(value))).unwrap();
             if let State::Halt = amp.run() {
                 halted = true;
             }
