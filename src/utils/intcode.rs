@@ -4,12 +4,12 @@ pub struct Computer {
     pub memory: Vec<i64>,
     pub pc: i64,
     pub base: i64,
-    pub expects_input: bool,
+    pub input_mode: Option<ParamMode>,
 }
 
 impl Computer {
     pub fn new(memory: Vec<i64>) -> Self {
-        Self { memory, pc: 0, base: 0, expects_input: false }
+        Self { memory, pc: 0, base: 0, input_mode: None }
     }
 
     pub fn run(&mut self) -> State {
@@ -17,33 +17,63 @@ impl Computer {
     }
 
     pub fn run_with(&mut self, input: impl IntoIterator<Item = i64>) -> State {
-        let mut iter = input.into_iter();
+        let mut inputs = input.into_iter();
 
         loop {
-            if self.expects_input {
-                let input = match iter.next() {
+            if let Some(mode) = self.input_mode {
+                let input = match inputs.next() {
                     None => return State::WaitingForInput,
                     Some(input) => input,
                 };
-                self.expects_input = false;
-                let mode = ParamMode::new(self.memory[self.pc as usize - 1] / 100);
+                self.input_mode = None;
                 self.write(input, mode);
             }
 
-            loop {
-                let instruction = self.memory[self.pc as usize];
-                self.pc += 1;
-                let opcode = Opcode::new(instruction % 100);
-                let modes = ParamModes { n: instruction / 100 };
-                let mut handle = Params { comp: self, modes };
+            let instruction = self.memory[self.pc as usize];
+            self.pc += 1;
+            let opcode = Opcode::new(instruction % 100);
+            let mut params = Params { comp: self, modes: instruction / 100 };
 
-                if let Some(state) = opcode.operate(&mut handle) {
-                    match state {
-                        State::Halt => return State::Halt,
-                        State::WaitingForInput => break,
-                        State::Output(output) => return State::Output(output),
+            match opcode {
+                Opcode::Add => {
+                    let sum = params.read() + params.read();
+                    params.write(sum);
+                }
+                Opcode::Multiply => {
+                    let product = params.read() * params.read();
+                    params.write(product);
+                }
+                Opcode::Input => self.input_mode = Some(params.next_mode()),
+                Opcode::Output => return State::Output(params.read()),
+                Opcode::JumpTrue => {
+                    let condition = params.read() != 0;
+                    let address = params.read();
+                    if condition {
+                        self.pc = address;
                     }
                 }
+                Opcode::JumpFalse => {
+                    let condition = params.read() == 0;
+                    let address = params.read();
+                    if condition {
+                        self.pc = address;
+                    }
+                }
+                Opcode::LessThan => {
+                    let first = params.read();
+                    let second = params.read();
+                    params.write((first < second) as i64);
+                }
+                Opcode::EqualTo => {
+                    let first = params.read();
+                    let second = params.read();
+                    params.write((first == second) as i64);
+                }
+                Opcode::Adjust => {
+                    let offset = params.read();
+                    self.base += offset;
+                }
+                Opcode::Halt => return State::Halt,
             }
         }
     }
@@ -51,11 +81,13 @@ impl Computer {
     pub fn read(&mut self, mode: ParamMode) -> i64 {
         let value = self.memory[self.pc as usize];
         self.pc += 1;
+
         let address = match mode {
             ParamMode::Position => value,
             ParamMode::Immediate => return value,
             ParamMode::Relative => self.base + value,
         } as usize;
+
         self.memory.get(address).copied().unwrap_or(0)
     }
 
@@ -78,29 +110,24 @@ impl Computer {
 
 struct Params<'a> {
     comp: &'a mut Computer,
-    modes: ParamModes,
+    modes: i64,
 }
 
 impl Params<'_> {
     fn read(&mut self) -> i64 {
-        self.comp.read(self.modes.next())
+        let mode = self.next_mode();
+        self.comp.read(mode)
     }
 
     fn write(&mut self, value: i64) {
-        let mode = self.modes.next();
+        let mode = self.next_mode();
         self.comp.write(value, mode);
     }
 
-    fn jump_to(&mut self, address: i64) {
-        self.comp.pc = address;
-    }
-
-    fn adjust_by(&mut self, offset: i64) {
-        self.comp.base += offset;
-    }
-
-    fn expect_input(&mut self) {
-        self.comp.expects_input = true;
+    fn next_mode(&mut self) -> ParamMode {
+        let mode = ParamMode::new(self.modes % 10);
+        self.modes /= 10;
+        mode
     }
 }
 
@@ -133,54 +160,6 @@ impl Opcode {
             99 => Self::Halt,
             _ => panic!("invalid opcode: {}", opcode),
         }
-    }
-
-    fn operate(self, params: &mut Params<'_>) -> Option<State> {
-        match self {
-            Self::Add => {
-                let sum = params.read() + params.read();
-                params.write(sum);
-            }
-            Self::Multiply => {
-                let product = params.read() * params.read();
-                params.write(product);
-            }
-            Self::Input => {
-                params.expect_input();
-                return Some(State::WaitingForInput);
-            }
-            Self::Output => return Some(State::Output(params.read())),
-            Self::JumpTrue => {
-                let condition = params.read() != 0;
-                let address = params.read();
-                if condition {
-                    params.jump_to(address);
-                }
-            }
-            Self::JumpFalse => {
-                let condition = params.read() == 0;
-                let address = params.read();
-                if condition {
-                    params.jump_to(address);
-                }
-            }
-            Self::LessThan => {
-                let first = params.read();
-                let second = params.read();
-                params.write(if first < second { 1 } else { 0 });
-            }
-            Self::EqualTo => {
-                let first = params.read();
-                let second = params.read();
-                params.write(if first == second { 1 } else { 0 });
-            }
-            Self::Adjust => {
-                let offset = params.read();
-                params.adjust_by(offset);
-            }
-            Self::Halt => return Some(State::Halt),
-        }
-        None
     }
 }
 
@@ -233,17 +212,5 @@ impl ParamMode {
             2 => Self::Relative,
             k => panic!("invalid parameter mode: {}", k),
         }
-    }
-}
-
-struct ParamModes {
-    n: i64,
-}
-
-impl ParamModes {
-    fn next(&mut self) -> ParamMode {
-        let mode = ParamMode::new(self.n % 10);
-        self.n /= 10;
-        mode
     }
 }
