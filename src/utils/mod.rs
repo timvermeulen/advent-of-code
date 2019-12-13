@@ -1,11 +1,13 @@
 mod cache;
 mod digits;
+mod pos;
 mod useful_parsers;
 
 pub mod intcode;
 
 pub use cache::*;
 pub use digits::*;
+pub use pos::*;
 pub use useful_parsers::*;
 
 use std::{collections::HashMap, hash::Hash};
