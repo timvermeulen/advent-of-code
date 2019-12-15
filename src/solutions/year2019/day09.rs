@@ -15,7 +15,7 @@ fn part2(memory: &[i64]) -> i64 {
 
 fn run(memory: &[i64], input: i64) -> i64 {
     let mut comp = Computer::new(memory.to_owned());
-    comp.run_with(iter::once(input)).unwrap()
+    comp.run_with(input).unwrap()
 }
 
 #[async_std::test]

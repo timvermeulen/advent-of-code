@@ -7,7 +7,7 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
 
 fn run(memory: Vec<i64>, input: i64) -> i64 {
     let mut computer = Computer::new(memory);
-    iter::from_fn(|| computer.run_with(iter::once(input)).output()).last().unwrap()
+    iter::from_fn(|| computer.run_with(input).output()).last().unwrap()
 }
 
 fn part1(memory: Vec<i64>) -> i64 {

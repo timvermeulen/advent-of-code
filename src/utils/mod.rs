@@ -1,5 +1,6 @@
 mod cache;
 mod digits;
+mod grid;
 mod pos;
 mod useful_parsers;
 
@@ -7,6 +8,7 @@ pub mod intcode;
 
 pub use cache::*;
 pub use digits::*;
+pub use grid::*;
 pub use pos::*;
 pub use useful_parsers::*;
 

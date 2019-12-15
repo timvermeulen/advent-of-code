@@ -22,9 +22,7 @@ fn part2(mut arcade: Computer) -> i64 {
     let mut output = 0;
 
     loop {
-        let input = iter::once((ball_x - paddle_x).signum());
-
-        let x = match arcade.run_with(input).output() {
+        let x = match arcade.run_with((ball_x - paddle_x).signum()).output() {
             None => return output,
             Some(x) => x,
         };

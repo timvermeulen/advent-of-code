@@ -11,23 +11,17 @@ impl Pos {
         (other.x - self.x).abs() + (other.y - self.y).abs()
     }
 
-    pub fn left(mut self) -> Self {
-        self.x -= 1;
-        self
+    pub fn move_to(&mut self, dir: Dir) {
+        match dir {
+            Dir::North => self.y -= 1,
+            Dir::South => self.y += 1,
+            Dir::West => self.x -= 1,
+            Dir::East => self.x += 1,
+        }
     }
 
-    pub fn right(mut self) -> Self {
-        self.x += 1;
-        self
-    }
-
-    pub fn up(mut self) -> Self {
-        self.y -= 1;
-        self
-    }
-
-    pub fn down(mut self) -> Self {
-        self.y += 1;
+    pub fn moving_to(mut self, dir: Dir) -> Self {
+        self.move_to(dir);
         self
     }
 
@@ -36,7 +30,7 @@ impl Pos {
     }
 
     pub fn neighbors(self) -> impl Iterator<Item = Self> {
-        iter!([self.left(), self.right(), self.up(), self.down()])
+        Dir::all().map(move |dir| self.moving_to(dir))
     }
 
     pub fn non_neg_neighbors(self) -> impl Iterator<Item = Self> {
@@ -45,18 +39,49 @@ impl Pos {
 
     pub fn diag_neighbors(self) -> impl Iterator<Item = Self> {
         iter!([
-            self.left(),
-            self.right(),
-            self.up(),
-            self.down(),
-            self.up().left(),
-            self.up().right(),
-            self.down().left(),
-            self.down().right()
+            self.moving_to(Dir::West),
+            self.moving_to(Dir::East),
+            self.moving_to(Dir::North),
+            self.moving_to(Dir::South),
+            self.moving_to(Dir::North).moving_to(Dir::West),
+            self.moving_to(Dir::North).moving_to(Dir::East),
+            self.moving_to(Dir::South).moving_to(Dir::West),
+            self.moving_to(Dir::South).moving_to(Dir::East),
         ])
     }
 
     pub fn non_neg_diag_neighbors(self) -> impl Iterator<Item = Self> {
         self.diag_neighbors().filter(|p| p.is_non_neg())
+    }
+}
+
+#[derive(Copy, Clone, Eq, PartialEq, Hash, Debug)]
+pub enum Dir {
+    North,
+    South,
+    West,
+    East,
+}
+
+impl Dir {
+    pub fn all() -> impl Iterator<Item = Self> {
+        iter!([Self::North, Self::South, Self::West, Self::East])
+    }
+
+    pub fn left(self) -> Self {
+        match self {
+            Self::North => Self::West,
+            Self::South => Self::East,
+            Self::West => Self::South,
+            Self::East => Self::North,
+        }
+    }
+
+    pub fn right(self) -> Self {
+        self.left().opposite()
+    }
+
+    pub fn opposite(self) -> Self {
+        self.left().left()
     }
 }

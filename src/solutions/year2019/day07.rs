@@ -21,7 +21,7 @@ fn run_part1(memory: &[i64], settings: [i64; 5]) -> i64 {
     let mut amps = [amp(), amp(), amp(), amp(), amp()];
     iter!(amps)
         .zip(&settings)
-        .fold(0, |input, (mut amp, &setting)| amp.run_with(iter!([setting, input])).unwrap())
+        .fold(0, |input, (mut amp, &setting)| amp.run_with_iter(iter!([setting, input])).unwrap())
 }
 
 fn part2(memory: &[i64]) -> i64 {
@@ -43,7 +43,8 @@ fn run_part2(memory: &[i64], settings: [i64; 5]) -> i64 {
     loop {
         let mut halted = false;
         for amp in &mut amps {
-            value = amp.run_with(settings.next().into_iter().chain(iter::once(value))).unwrap();
+            value =
+                amp.run_with_iter(settings.next().into_iter().chain(iter::once(value))).unwrap();
             if let State::Halt = amp.run() {
                 halted = true;
             }

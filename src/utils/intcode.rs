@@ -1,5 +1,6 @@
 use std::convert::TryFrom;
 
+#[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Computer {
     pub memory: Vec<i64>,
     pub pc: i64,
@@ -13,10 +14,14 @@ impl Computer {
     }
 
     pub fn run(&mut self) -> State {
-        self.run_with(std::iter::empty())
+        self.run_with_iter(None)
     }
 
-    pub fn run_with(&mut self, input: impl IntoIterator<Item = i64>) -> State {
+    pub fn run_with(&mut self, input: i64) -> State {
+        self.run_with_iter(Some(input))
+    }
+
+    pub fn run_with_iter(&mut self, input: impl IntoIterator<Item = i64>) -> State {
         let mut inputs = input.into_iter();
 
         loop {
@@ -197,7 +202,7 @@ impl State {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum ParamMode {
     Position,
     Immediate,
