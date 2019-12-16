@@ -14,6 +14,18 @@ impl<T: Clone> Grid<T> {
     pub fn new(default: T) -> Self {
         Self { default, elements: HashMap::new() }
     }
+
+    pub fn iter(&self) -> impl Iterator<Item = (Pos, &T)> {
+        self.elements.iter().map(|(&pos, x)| (pos, x))
+    }
+
+    pub fn iter_mut(&mut self) -> impl Iterator<Item = (Pos, &mut T)> {
+        self.elements.iter_mut().map(|(&pos, x)| (pos, x))
+    }
+
+    pub fn into_iter(self) -> impl Iterator<Item = (Pos, T)> {
+        self.elements.into_iter()
+    }
 }
 
 impl<T> Index<Pos> for Grid<T> {
@@ -43,14 +55,7 @@ impl<T: Debug> Debug for Grid<T> {
             None => return write!(f, "an empty grid"),
         };
 
-        writeln!(
-            f,
-            "x from {} to {}, y from {} to {}",
-            xs.start(),
-            xs.end(),
-            ys.start(),
-            ys.end()
-        )?;
+        writeln!(f, "x in {:?}, y in {:?}", xs, ys)?;
 
         for y in ys {
             for x in xs.clone() {

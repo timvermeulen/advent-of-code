@@ -5,7 +5,10 @@ pub use rayon::prelude::*;
 pub use std::{
     cell::{Cell, RefCell},
     cmp::{self, Ordering},
-    collections::{BinaryHeap, HashMap, HashSet, LinkedList, VecDeque},
+    collections::{
+        hash_map::Entry::{self, *},
+        BinaryHeap, HashMap, HashSet, LinkedList, VecDeque,
+    },
     fmt::{self, Debug, Formatter},
     hash::Hash,
     iter::{self, successors, FromIterator},

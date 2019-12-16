@@ -41,6 +41,7 @@ fn part1(memory: Vec<i64>) -> usize {
     seen.insert(pos);
 
     while let Some((dir, dist)) = states.pop() {
+        // backtracking
         moves.drain(dist..).rev().for_each(|dir: Dir| {
             drone.move_to(dir.opposite());
             pos.move_to(dir.opposite());

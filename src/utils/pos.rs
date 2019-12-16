@@ -84,4 +84,16 @@ impl Dir {
     pub fn opposite(self) -> Self {
         self.left().left()
     }
+
+    pub fn turn_left(&mut self) {
+        *self = self.left()
+    }
+
+    pub fn turn_right(&mut self) {
+        *self = self.right()
+    }
+
+    pub fn turn_around(&mut self) {
+        *self = self.opposite()
+    }
 }
