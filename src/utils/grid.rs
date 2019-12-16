@@ -26,6 +26,14 @@ impl<T: Clone> Grid<T> {
     pub fn into_iter(self) -> impl Iterator<Item = (Pos, T)> {
         self.elements.into_iter()
     }
+
+    pub fn map<U: Clone>(self, mut f: impl FnMut(T) -> U) -> Grid<U> {
+        let mut grid = Grid::new(f(self.default));
+        for (pos, x) in self.elements {
+            grid[pos] = f(x);
+        }
+        grid
+    }
 }
 
 impl<T> Index<Pos> for Grid<T> {

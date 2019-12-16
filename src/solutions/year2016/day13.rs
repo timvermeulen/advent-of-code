@@ -1,5 +1,5 @@
 use super::*;
-use pathfinding::prelude::*;
+use search_algs::*;
 
 fn part1(n: i32) -> i32 {
     let is_wall = |Pos { x, y }| {
