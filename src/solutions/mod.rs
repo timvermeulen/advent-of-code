@@ -9,7 +9,7 @@ pub use std::{
         hash_map::Entry::{self, *},
         BinaryHeap, HashMap, HashSet, LinkedList, VecDeque,
     },
-    fmt::{self, Debug, Formatter},
+    fmt::{self, Debug, Display, Formatter},
     hash::Hash,
     iter::{self, successors, FromIterator},
     mem,

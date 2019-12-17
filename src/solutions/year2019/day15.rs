@@ -1,5 +1,5 @@
 use super::*;
-use intcode::*;
+use intcode::prelude::*;
 
 struct Drone {
     comp: Computer,
@@ -17,12 +17,8 @@ impl Drone {
             Dir::West => 3,
             Dir::East => 4,
         };
-        self.comp.run_with(command).unwrap()
+        self.comp.step_with(command).unwrap()
     }
-}
-
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
-    parser::i64().collect_sep_by(comma())
 }
 
 fn part1(memory: Vec<i64>) -> usize {
@@ -69,7 +65,7 @@ fn part1(memory: Vec<i64>) -> usize {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 15).await?;
-    let memory = parser().parse_to_end(&input).unwrap();
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(memory), 270);
     Ok(())
 }
@@ -85,7 +81,7 @@ mod benches {
     fn bench_part1(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 15)).unwrap();
         b.iter(|| {
-            let memory = parser().parse_to_end(&input).unwrap();
+            let memory = intcode::parser().parse_to_end(&input).unwrap();
             part1(memory)
         });
     }

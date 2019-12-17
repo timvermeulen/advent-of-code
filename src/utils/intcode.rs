@@ -1,36 +1,93 @@
-use std::convert::TryFrom;
+use parser::prelude::*;
+use std::iter;
+
+pub mod prelude {
+    pub use super::{Computer, Interrupt};
+}
+
+pub fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
+    parser::i64().collect_sep_by(token(','))
+}
 
 #[derive(Clone, Eq, PartialEq, Hash)]
 pub struct Computer {
     pub memory: Vec<i64>,
     pub pc: i64,
     pub base: i64,
-    pub input_mode: Option<ParamMode>,
+    pub state: State,
+}
+
+pub struct Iter<'a, I>
+where
+    I: Iterator<Item = i64>,
+{
+    inputs: I,
+    comp: &'a mut Computer,
+}
+
+impl<I> Iterator for Iter<'_, I>
+where
+    I: Iterator<Item = i64>,
+{
+    type Item = i64;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.comp.step_with_iter(&mut self.inputs).output()
+    }
 }
 
 impl Computer {
     pub fn new(memory: Vec<i64>) -> Self {
-        Self { memory, pc: 0, base: 0, input_mode: None }
+        Self { memory, pc: 0, base: 0, state: State::Idle }
     }
 
-    pub fn run(&mut self) -> State {
-        self.run_with_iter(None)
+    pub fn needs_input(&self) -> bool {
+        match self.state {
+            State::Idle | State::Halted => false,
+            State::WaitingForInput(_) => true,
+        }
     }
 
-    pub fn run_with(&mut self, input: i64) -> State {
-        self.run_with_iter(Some(input))
+    pub fn is_halted(&self) -> bool {
+        match self.state {
+            State::Idle | State::WaitingForInput(_) => false,
+            State::Halted => true,
+        }
     }
 
-    pub fn run_with_iter(&mut self, input: impl IntoIterator<Item = i64>) -> State {
+    pub fn run(&mut self) -> Iter<'_, iter::Empty<i64>> {
+        self.run_with_iter(iter::empty())
+    }
+
+    pub fn run_with(&mut self, input: i64) -> Iter<'_, iter::Once<i64>> {
+        self.run_with_iter(iter::once(input))
+    }
+
+    pub fn run_with_iter<I>(&mut self, inputs: I) -> Iter<'_, I::IntoIter>
+    where
+        I: IntoIterator<Item = i64>,
+    {
+        Iter { inputs: inputs.into_iter(), comp: self }
+    }
+
+    pub fn step(&mut self) -> Interrupt {
+        self.step_with_iter(None)
+    }
+
+    pub fn step_with(&mut self, input: i64) -> Interrupt {
+        self.step_with_iter(Some(input))
+    }
+
+    pub fn step_with_iter(&mut self, input: impl IntoIterator<Item = i64>) -> Interrupt {
         let mut inputs = input.into_iter();
 
         loop {
-            if let Some(mode) = self.input_mode {
+            if let State::WaitingForInput(mode) = self.state {
                 let input = match inputs.next() {
-                    None => return State::WaitingForInput,
+                    None => return Interrupt::WaitingForInput,
                     Some(input) => input,
                 };
-                self.input_mode = None;
+                self.state = State::Idle;
                 self.write(input, mode);
             }
 
@@ -48,8 +105,8 @@ impl Computer {
                     let product = params.read() * params.read();
                     params.write(product);
                 }
-                Opcode::Input => self.input_mode = Some(params.next_mode()),
-                Opcode::Output => return State::Output(params.read()),
+                Opcode::Input => self.state = State::WaitingForInput(params.next_mode()),
+                Opcode::Output => return Interrupt::Output(params.read()),
                 Opcode::JumpTrue => {
                     let condition = params.read() != 0;
                     let address = params.read();
@@ -78,7 +135,10 @@ impl Computer {
                     let offset = params.read();
                     self.base += offset;
                 }
-                Opcode::Halt => return State::Halt,
+                Opcode::Halt => {
+                    self.state = State::Halted;
+                    return Interrupt::Halt;
+                }
             }
         }
     }
@@ -169,13 +229,13 @@ impl Opcode {
 }
 
 #[derive(Debug, PartialEq)]
-pub enum State {
+pub enum Interrupt {
     Halt,
     WaitingForInput,
     Output(i64),
 }
 
-impl State {
+impl Interrupt {
     pub fn output(self) -> Option<i64> {
         match self {
             Self::Halt | Self::WaitingForInput => None,
@@ -200,6 +260,13 @@ impl State {
             Self::WaitingForInput => true,
         }
     }
+}
+
+#[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
+pub enum State {
+    Idle,
+    Halted,
+    WaitingForInput(ParamMode),
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]

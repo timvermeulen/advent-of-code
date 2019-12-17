@@ -1,15 +1,12 @@
 use super::*;
-
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
-    parser::i64().collect_sep_by(comma())
-}
+use intcode::prelude::*;
 
 fn run(memory: &[i64], noun: i64, verb: i64) -> i64 {
     let mut memory = memory.to_owned();
     memory[1] = noun;
     memory[2] = verb;
-    let mut computer = intcode::Computer::new(memory);
-    computer.run();
+    let mut computer = Computer::new(memory);
+    computer.step();
     computer.memory[0]
 }
 
@@ -31,7 +28,7 @@ fn part2(memory: &[i64]) -> i64 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 2).await?;
-    let memory = parser().parse_to_end(&input).unwrap();
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(&memory), 3_409_710);
     assert_eq!(part2(&memory), 7912);
     Ok(())

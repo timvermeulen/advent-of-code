@@ -1,12 +1,12 @@
 use super::*;
-use intcode::*;
+use intcode::prelude::*;
 
 fn part1(arcade: &mut Computer) -> u32 {
     let mut block_count = 0;
 
-    while let State::Output(_x) = arcade.run() {
-        let _y = arcade.run();
-        if arcade.run().unwrap() == 2 {
+    while let Interrupt::Output(_x) = arcade.step() {
+        let _y = arcade.step();
+        if arcade.step().unwrap() == 2 {
             block_count += 1;
         }
     }
@@ -22,12 +22,12 @@ fn part2(mut arcade: Computer) -> i64 {
     let mut output = 0;
 
     loop {
-        let x = match arcade.run_with((ball_x - paddle_x).signum()).output() {
+        let x = match arcade.step_with((ball_x - paddle_x).signum()).output() {
             None => return output,
             Some(x) => x,
         };
-        let _y = arcade.run();
-        let z = arcade.run().unwrap();
+        let _y = arcade.step();
+        let z = arcade.step().unwrap();
 
         if x == -1 {
             output = z;
@@ -44,7 +44,7 @@ fn part2(mut arcade: Computer) -> i64 {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 13).await?;
-    let memory = parser::i64().collect_sep_by(comma()).parse_to_end(&input).unwrap();
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     let mut arcade = Computer::new(memory);
     assert_eq!(part1(&mut arcade), 363);
     assert_eq!(part2(arcade), 17_159);
@@ -62,7 +62,7 @@ mod benches {
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 13)).unwrap();
         b.iter(|| {
-            let memory = parser::i64().collect_sep_by(comma()).parse_to_end(&input).unwrap();
+            let memory = intcode::parser().parse_to_end(&input).unwrap();
             let mut arcade = Computer::new(memory);
             (part1(&mut arcade), part2(arcade))
         });

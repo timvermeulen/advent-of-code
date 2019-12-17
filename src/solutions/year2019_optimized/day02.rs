@@ -1,13 +1,10 @@
 use super::*;
-
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
-    parser::i64().collect_sep_by(comma())
-}
+use intcode::prelude::*;
 
 fn run(mut memory: Vec<i64>, noun: i64, verb: i64) -> i64 {
     memory[1] = noun;
     memory[2] = verb;
-    let mut computer = intcode::Computer::new(memory);
+    let mut computer = Computer::new(memory);
     computer.run();
     computer.memory[0]
 }

@@ -1,9 +1,5 @@
 use super::*;
-use intcode::*;
-
-fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
-    parser::i64().collect_sep_by(comma())
-}
+use intcode::prelude::*;
 
 #[derive(Copy, Clone, PartialEq)]
 enum Color {
@@ -28,17 +24,17 @@ fn part1(memory: Vec<i64>) -> usize {
 
     loop {
         let input = (paint[pos] == Color::White) as i64;
-        let color = match bot.run_with(input) {
-            State::Halt => return paint.iter().count(),
-            State::WaitingForInput => unreachable!(),
-            State::Output(x) => x,
+        let color = match bot.step_with(input) {
+            Interrupt::Halt => return paint.iter().count(),
+            Interrupt::WaitingForInput => unreachable!(),
+            Interrupt::Output(x) => x,
         };
         paint[pos] = match color {
             0 => Color::Black,
             1 => Color::White,
             _ => unreachable!(),
         };
-        match bot.run().unwrap() {
+        match bot.step().unwrap() {
             0 => dir.turn_left(),
             1 => dir.turn_right(),
             _ => unreachable!(),
@@ -55,16 +51,16 @@ fn part2(memory: Vec<i64>) {
     paint[pos] = Color::White;
 
     loop {
-        if bot.run().is_halt() {
+        if bot.step().is_halt() {
             return break;
         }
         let input = (paint[pos] == Color::White) as i64;
-        paint[pos] = match bot.run_with(input).unwrap() {
+        paint[pos] = match bot.step_with(input).unwrap() {
             0 => Color::Black,
             1 => Color::White,
             _ => unreachable!(),
         };
-        match bot.run().unwrap() {
+        match bot.step().unwrap() {
             0 => dir.turn_left(),
             1 => dir.turn_right(),
             _ => unreachable!(),
@@ -78,7 +74,7 @@ fn part2(memory: Vec<i64>) {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 11).await?;
-    let memory = parser().parse_to_end(&input).unwrap();
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     assert_eq!(part1(memory.clone()), 1883);
     part2(memory);
     Ok(())
