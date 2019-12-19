@@ -82,13 +82,20 @@ impl Computer {
         let mut inputs = input.into_iter();
 
         loop {
-            if let State::WaitingForInput(mode) = self.state {
-                let input = match inputs.next() {
-                    None => return Interrupt::WaitingForInput,
-                    Some(input) => input,
-                };
-                self.state = State::Idle;
-                self.write(input, mode);
+            match self.state {
+                State::Halted => {
+                    println!("the program was already halted");
+                    return Interrupt::Halt;
+                }
+                State::WaitingForInput(mode) => {
+                    let input = match inputs.next() {
+                        None => return Interrupt::WaitingForInput,
+                        Some(input) => input,
+                    };
+                    self.state = State::Idle;
+                    self.write(input, mode);
+                }
+                State::Idle => {}
             }
 
             let instruction = self.memory[self.pc as usize];
