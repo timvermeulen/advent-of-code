@@ -7,6 +7,10 @@ pub struct Pos {
 }
 
 impl Pos {
+    pub fn origin() -> Self {
+        Self { x: 0, y: 0 }
+    }
+
     pub fn manhattan_distance(self, other: Self) -> i32 {
         (other.x - self.x).abs() + (other.y - self.y).abs()
     }

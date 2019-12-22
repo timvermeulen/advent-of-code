@@ -61,7 +61,7 @@ fn erosion(
     Cache::new(move |&pos, f| {
         let from_geo = |geo| (geo + depth) % 20_183;
         let geo = match pos {
-            Pos { x: 0, y: 0 } => 0,
+            Pos::origin() => 0,
             pos if pos == target => 0,
             Pos { x, y: 0 } => x * 16_807,
             Pos { x: 0, y } => y * 48_271,
@@ -83,7 +83,7 @@ fn part2(depth: i32, target: Pos) -> i32 {
     let mut erosion = Cache::new(|&pos, f| {
         let from_geo = |geo| (geo + depth) % 20_183;
         let geo = match pos {
-            Pos { x: 0, y: 0 } => 0,
+            Pos::origin() => 0,
             pos if pos == target => 0,
             Pos { x, y: 0 } => x * 16_807,
             Pos { x: 0, y } => y * 48_271,
@@ -94,7 +94,7 @@ fn part2(depth: i32, target: Pos) -> i32 {
     let mut type_of = |pos| Type::new(erosion.get(pos));
 
     let (_, len) = astar(
-        &(Pos { x: 0, y: 0 }, State::Torch),
+        &(Pos::origin(), State::Torch),
         |&(pos, state)| {
             let mut vec: Vec<_> = pos
                 .non_neg_neighbors()
