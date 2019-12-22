@@ -5,7 +5,7 @@ fn run(mut memory: Vec<i64>, noun: i64, verb: i64) -> i64 {
     memory[1] = noun;
     memory[2] = verb;
     let mut computer = Computer::new(memory);
-    computer.run();
+    computer.step();
     computer.memory[0]
 }
 

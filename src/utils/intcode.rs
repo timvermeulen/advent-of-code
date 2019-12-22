@@ -84,8 +84,8 @@ impl Computer {
         loop {
             match self.state {
                 State::Halted => {
-                    println!("the program was already halted");
-                    return Interrupt::Halt;
+                    println!("warning: the program has been halted before");
+                    self.state = State::Idle;
                 }
                 State::WaitingForInput(mode) => {
                     let input = match inputs.next() {
