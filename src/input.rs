@@ -26,7 +26,7 @@ pub async fn get_input(year: u32, day: u32) -> Result<String, InputError> {
         Ok(input) => Ok(input),
         Err(_) => {
             let mut input = download_input(year, day).await?;
-            input.truncate(input.trim_end().len()); // remove the trailing newline
+            input.truncate(input.len() - 1); // remove the trailing newline
             write_input(year, path, &input).await?;
             Ok(input)
         }
