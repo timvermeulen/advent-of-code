@@ -38,6 +38,15 @@ mod benches {
     use test::Bencher;
 
     #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 16)).unwrap();
+        b.iter(|| {
+            let digits = parse(&input);
+            (part1(&digits), part2(&digits))
+        });
+    }
+
+    #[bench]
     fn bench_part2(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 16)).unwrap();
         b.iter(|| {

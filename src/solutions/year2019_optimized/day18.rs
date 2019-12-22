@@ -12,7 +12,7 @@ fn part2(input: &str) -> i32 {
 
     for &(dx, dy) in &[(-1, -1), (-1, 1), (1, -1), (1, 1)] {
         let entrance = Pos { x: entrance.x + dx, y: entrance.y + dy };
-        
+
         let mut max_dist = 0;
         let mut prev_dist = 0;
         let mut last_key_dist = 0;

@@ -124,4 +124,13 @@ mod benches {
         let reactions = parser().parse_to_end(&input).unwrap();
         b.iter(|| part2(&reactions));
     }
+
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 14)).unwrap();
+        b.iter(|| {
+            let reactions = parser().parse_to_end(&input).unwrap();
+            (part1(&reactions), part2(&reactions))
+        });
+    }
 }

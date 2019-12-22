@@ -38,3 +38,20 @@ async fn test() -> Result<(), InputError> {
     assert_eq!(part2(&orbits), 454);
     Ok(())
 }
+
+#[cfg(test)]
+mod benches {
+    extern crate test;
+
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 6)).unwrap();
+        b.iter(|| {
+            let orbits = parser().parse_to_end(&input).unwrap();
+            (part1(&orbits), part2(&orbits))
+        });
+    }
+}

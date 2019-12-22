@@ -57,3 +57,20 @@ async fn test() -> Result<(), InputError> {
     assert_eq!(part2(&memory), 21_844_737);
     Ok(())
 }
+
+#[cfg(test)]
+mod benches {
+    extern crate test;
+
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 7)).unwrap();
+        b.iter(|| {
+            let memory = intcode::parser().parse_to_end(&input).unwrap();
+            (part1(&memory), part2(&memory))
+        });
+    }
+}

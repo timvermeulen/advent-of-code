@@ -138,7 +138,7 @@ mod benches {
     }
 
     #[bench]
-    fn bench_both(b: &mut Bencher) {
+    fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 12)).unwrap();
         b.iter(|| {
             let moons = parser().parse_to_end(&input).unwrap();

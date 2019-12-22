@@ -70,4 +70,10 @@ mod benches {
         let input = futures::executor::block_on(get_input(2019, 8)).unwrap();
         b.iter(|| part2(&input));
     }
+
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 8)).unwrap();
+        b.iter(|| (part1(&input), part2(&input)));
+    }
 }

@@ -202,7 +202,7 @@ mod benches {
     }
 
     #[bench]
-    fn bench_both(b: &mut Bencher) {
+    fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 10)).unwrap();
         b.iter(|| {
             let asteroids = parse(&input);

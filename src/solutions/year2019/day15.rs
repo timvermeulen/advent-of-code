@@ -21,10 +21,10 @@ impl Drone {
     }
 }
 
-fn part1(memory: Vec<i64>) -> usize {
+fn solve(memory: Vec<i64>) -> (usize, usize) {
     let mut drone = Drone::new(memory);
 
-    let mut pos = Pos { x: 0, y: 0 };
+    let mut pos = Pos::origin();
     let mut distance = 0;
 
     let mut moves = Vec::new();
@@ -36,6 +36,9 @@ fn part1(memory: Vec<i64>) -> usize {
     let mut seen = HashSet::new();
     seen.insert(pos);
 
+    let mut oxygen = Pos::origin();
+    let mut part1 = 0;
+
     while let Some((dir, dist)) = states.pop() {
         // backtracking
         moves.drain(dist..).rev().for_each(|dir: Dir| {
@@ -46,7 +49,10 @@ fn part1(memory: Vec<i64>) -> usize {
         match drone.move_to(dir) {
             0 => continue,
             1 => {}
-            2 => return dist + 1,
+            2 => {
+                part1 = dist + 1;
+                oxygen = pos.moving_to(dir);
+            }
             _ => unreachable!(),
         }
 
@@ -54,19 +60,36 @@ fn part1(memory: Vec<i64>) -> usize {
         pos.move_to(dir);
         seen.insert(pos);
 
-        for dir in Dir::all().filter(|&dir| !seen.contains(&pos.moving_to(dir))) {
-            states.push((dir, dist + 1));
+        for dir in Dir::all() {
+            let n = pos.moving_to(dir);
+            if !seen.contains(&n) {
+                states.push((dir, dist + 1));
+            }
         }
     }
 
-    unreachable!()
+    seen.remove(&oxygen);
+    let mut part2 = 0;
+
+    let mut states = vec![(oxygen, 0)];
+    while let Some((pos, dist)) = states.pop() {
+        part2 = cmp::max(part2, dist);
+        for dir in Dir::all() {
+            let n = pos.moving_to(dir);
+            if seen.remove(&n) {
+                states.push((n, dist + 1));
+            }
+        }
+    }
+
+    (part1, part2)
 }
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 15).await?;
     let memory = intcode::parser().parse_to_end(&input).unwrap();
-    assert_eq!(part1(memory), 270);
+    assert_eq!(solve(memory), (270, 364));
     Ok(())
 }
 
@@ -82,7 +105,7 @@ mod benches {
         let input = futures::executor::block_on(get_input(2019, 15)).unwrap();
         b.iter(|| {
             let memory = intcode::parser().parse_to_end(&input).unwrap();
-            part1(memory)
+            solve(memory)
         });
     }
 }
