@@ -1,6 +1,9 @@
 use super::*;
 use search_algs::*;
 
+// IMPORTANT:
+// don't bother reading this code, it's not supposed to make any sense
+
 #[derive(Debug, Eq, PartialEq, Copy, Clone)]
 struct PortalID([u8; 2]);
 
@@ -140,6 +143,13 @@ fn data(input: &str) -> Data {
 
     let thickness = (2..).find(|&i| byte_at(Pos { x: i, y: i }) == b' ').unwrap() as usize - 2;
 
+    let is_in_corner = |Pos { x, y }| {
+        let w = width as i32;
+        let h = height as i32;
+        let t = thickness as i32 + 2;
+        x < t && y < t || x < t && y >= h - t || x >= w - t && y >= h - t || x >= w - t && y < t
+    };
+
     for x in 2..width - 2 {
         add_portal(x, 2, Dir::North);
         add_portal(x, height as usize - 3, Dir::South);
@@ -196,8 +206,6 @@ fn data(input: &str) -> Data {
     };
 
     let mut stack = Vec::new();
-    let mut other_points = Vec::new(); // (key, distance to entrance, distance to branch)
-
     let mut remaining_portals = Mask((1 << num_portals) - 1);
 
     while let Some(i) = remaining_portals.first() {
@@ -205,47 +213,73 @@ fn data(input: &str) -> Data {
         let (_id, pos, dir) = portals[i];
 
         stack.clear();
-        stack.push((pos, 0, dir));
-        other_points.clear();
+        stack.push((pos.moving_to(dir), 0, dir));
 
-        let mut prev_dist = 0;
+        let mut prev_steps = 0;
         let mut other_portal = 0;
-        let mut only_dist = 0;
+        let mut only_steps = 0;
 
-        while let Some((pos, dist, dir)) = stack.pop() {
-            if dist != prev_dist + 1 {
+        // Option<(portal, distance to entrance, distance to branch)>
+        let mut second = None;
+        let mut third = None;
+        let mut fourth_found = false;
+
+        while let Some((pos, steps, dir)) = stack.pop() {
+            let dist = 2 * steps + 1;
+            if steps != prev_steps + 1 {
                 // bracktracking
-                for (_, _, branch_dist) in &mut other_points {
-                    *branch_dist = cmp::min(*branch_dist, dist - 1);
-                }
-            }
-            prev_dist = dist;
+                if let Some((_, _, ref mut branch_dist)) = second {
+                    *branch_dist = cmp::min(*branch_dist, dist - 2);
 
-            for j in remaining_portals.iter() {
-                if pos == portals[j].1 {
-                    remaining_portals.remove(j);
-                    set_distance(i, j, dist);
-                    other_portal = j;
-                    only_dist = dist;
-
-                    for &(k, a, b) in &other_points {
-                        set_distance(j, k, dist + a - 2 * b);
+                    if let Some((_, _, ref mut branch_dist)) = third {
+                        *branch_dist = cmp::min(*branch_dist, dist - 2);
                     }
-
-                    other_points.push((j, dist, dist));
                 }
             }
+            prev_steps = steps;
 
             for &dir in &[dir, dir.left(), dir.right()] {
                 let n = pos.moving_to(dir);
-                if is_path(n) {
-                    stack.push((n, dist + 1, dir));
+                if is_path(n) && !is_in_corner(n) {
+                    let mut is_portal = false;
+
+                    for j in remaining_portals.iter() {
+                        if n == portals[j].1 {
+                            is_portal = true;
+                            remaining_portals.remove(j);
+                            set_distance(i, j, dist + 1);
+                            other_portal = j;
+                            only_steps = steps;
+
+                            if let Some((k, a, b)) = second {
+                                set_distance(j, k, dist + 2 + a - 2 * b);
+
+                                if let Some((k, a, b)) = third {
+                                    set_distance(j, k, dist + 2 + a - 2 * b);
+                                    fourth_found = true;
+                                } else {
+                                    third = Some((j, dist, dist));
+                                }
+                            } else {
+                                second = Some((j, dist, dist));
+                            }
+                            break;
+                        }
+                    }
+
+                    if !is_portal {
+                        stack.push((n.moving_to(dir), steps + 1, dir));
+                    }
                 }
+            }
+
+            if fourth_found {
+                break;
             }
         }
 
-        if other_points.len() == 1 {
-            // this room has only two portals, `i` and `other_portal`
+        if third == None {
+            // this room only has two portals
             let PortalInfo {
                 teleports_to: i0,
                 cost_of_teleportation: cost0,
@@ -260,7 +294,7 @@ fn data(input: &str) -> Data {
                 ..
             } = portal_info[other_portal];
 
-            let cost = cost0 + cost1 + only_dist;
+            let cost = cost0 + cost1 + 2 * only_steps + 2;
 
             let p0 = &mut portal_info[i0];
             p0.teleports_to = i1;
@@ -334,9 +368,7 @@ fn part2(data: &Data) -> u32 {
             })
         },
         |&(_, depth)| depth as u32 * (data.min_dist + 1),
-        |&(i, depth)| {
-            i == data.end && depth == 0
-        },
+        |&(i, depth)| i == data.end && depth == 0,
     )
     .unwrap();
     len
