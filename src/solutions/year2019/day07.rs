@@ -14,7 +14,7 @@ fn part1(memory: &[i64]) -> i64 {
 
 fn run_part1(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amp = || Computer::new(memory.to_owned());
-    let mut amps = [amp(), amp(), amp(), amp(), amp()];
+    let amps = [amp(), amp(), amp(), amp(), amp()];
     iter!(amps)
         .zip(&settings)
         .fold(0, |input, (mut amp, &setting)| amp.step_with_iter(iter!([setting, input])).unwrap())
@@ -47,6 +47,11 @@ fn run_part2(memory: &[i64], settings: [i64; 5]) -> i64 {
             return value;
         }
     }
+}
+
+pub fn solve(input: &str) -> (i64, i64) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
+    (part1(&memory), part2(&memory))
 }
 
 #[async_std::test]

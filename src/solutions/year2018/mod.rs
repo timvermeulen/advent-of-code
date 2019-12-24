@@ -1,9 +1,9 @@
 use super::*;
 
-mod day01;
-mod day02;
-mod day03;
-mod day04;
-mod day05;
-mod day22;
-mod day23;
+pub mod day01;
+pub mod day02;
+pub mod day03;
+pub mod day04;
+pub mod day05;
+pub mod day22;
+pub mod day23;

@@ -64,6 +64,11 @@ fn part2(techniques: &[Technique]) -> i128 {
     (t + u * v).rem_euclid(NUM_CARDS)
 }
 
+pub fn solve(input: &str) -> (i128, i128) {
+    let techniques = parser().parse_to_end(&input).unwrap();
+    (part1(&techniques), part2(&techniques))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 22).await?;

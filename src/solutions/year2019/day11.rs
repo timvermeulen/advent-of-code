@@ -52,7 +52,7 @@ fn part2(memory: Vec<i64>) -> [u8; 8] {
 
     loop {
         if bot.step().is_halt() {
-            return break;
+            break;
         }
         let input = (paint[pos] == Color::White) as i64;
         paint[pos] = match bot.step_with(input).unwrap() {
@@ -88,6 +88,11 @@ const CHARS: [u8; 32] = [
 
 fn identify([a, b, c, d, e]: [bool; 5]) -> u8 {
     CHARS[a as usize + 2 * b as usize + 4 * c as usize + 8 * d as usize + 16 * e as usize]
+}
+
+pub fn solve(input: &str) -> (usize, [u8; 8]) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
+    (part1(memory.clone()), part2(memory))
 }
 
 #[async_std::test]

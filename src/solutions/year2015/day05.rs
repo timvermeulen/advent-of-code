@@ -1,5 +1,3 @@
-use super::*;
-
 fn part1(input: &str) -> usize {
     input.lines().filter(|&s| is_nice1(s)).count()
 }
@@ -27,6 +25,13 @@ fn rule1(string: &str) -> bool {
 fn rule2(string: &str) -> bool {
     string.chars().zip(string.chars().skip(2)).any(|(a, b)| a == b)
 }
+
+pub fn solve(input: &str) -> (usize, usize) {
+    (part1(input), part2(input))
+}
+
+#[cfg(test)]
+use super::*;
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {

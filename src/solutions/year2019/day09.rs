@@ -14,6 +14,11 @@ fn run(memory: Vec<i64>, input: i64) -> i64 {
     comp.step_with(input).unwrap()
 }
 
+pub fn solve(input: &str) -> (i64, i64) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
+    (part1(memory.clone()), part2(memory))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 9).await?;

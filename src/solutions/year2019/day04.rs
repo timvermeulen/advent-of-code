@@ -29,6 +29,11 @@ fn part2(range: Range<u32>) -> usize {
         .count()
 }
 
+pub fn solve(input: &str) -> (usize, usize) {
+    let range = parser().parse_to_end(&input).unwrap();
+    (part1(range.clone()), part2(range))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 4).await?;

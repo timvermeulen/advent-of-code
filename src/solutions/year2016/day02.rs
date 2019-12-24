@@ -124,6 +124,11 @@ fn part2(digits: &[Vec<Direction>]) -> String {
         .collect()
 }
 
+pub fn solve(input: &str) -> (String, String) {
+    let directions = parser().parse_to_end(&input).unwrap();
+    (part1(&directions), part2(&directions))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2016, 2).await?;

@@ -194,11 +194,6 @@ fn data(input: &str) -> Data {
         }
     }
 
-    let pairwise_distance = |loc: Location, key: u8| match loc {
-        Location::Entrance => distance_to_entrance[key as usize].0,
-        Location::Key(k) => distance[key as usize][k as usize],
-    };
-
     let mut accessible_keys = Mask::new();
     for i in 0..26 {
         if all_keys.contains(i) && blocked_by_count[i as usize] == 0 {
@@ -292,6 +287,11 @@ fn part2(data: &Data) -> i32 {
     )
     .unwrap();
     cost
+}
+
+pub fn solve(input: &str) -> (i32, i32) {
+    let data = data(&input);
+    (part1(&data), part2(&data))
 }
 
 #[async_std::test]

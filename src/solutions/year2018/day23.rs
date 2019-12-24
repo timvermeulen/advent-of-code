@@ -208,6 +208,11 @@ fn part2(bots: &[NanoBot]) -> i32 {
     unreachable!()
 }
 
+pub fn solve(input: &str) -> (u32, i32) {
+    let bots = parser().parse_to_end(&input).unwrap();
+    (part1(&bots), part2(&bots))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 23).await?;

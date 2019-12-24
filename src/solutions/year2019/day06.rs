@@ -30,6 +30,11 @@ fn part2(orbits: &HashMap<&str, &str>) -> usize {
     a.len() + b.len() - 2 * in_common
 }
 
+pub fn solve(input: &str) -> (usize, usize) {
+    let orbits = parser().parse_to_end(&input).unwrap();
+    (part1(&orbits), part2(&orbits))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 6).await?;

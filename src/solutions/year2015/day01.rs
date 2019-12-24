@@ -34,6 +34,11 @@ fn part2(directions: &[Direction]) -> usize {
         + 1
 }
 
+pub fn solve(input: &str) -> (i32, usize) {
+    let directions = parser().parse_to_end(&input).unwrap();
+    (part1(&directions), part2(&directions))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 1).await?;

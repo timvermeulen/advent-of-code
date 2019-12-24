@@ -1,5 +1,4 @@
 use super::*;
-use search_algs::*;
 
 fn part1(n: i32) -> i32 {
     let is_wall = |Pos { x, y }| {
@@ -44,7 +43,7 @@ fn part2(n: i32) -> usize {
     let mut current = vec![start];
     let mut next = vec![];
 
-    for distance in 0..50 {
+    for _ in 0..50 {
         for p in current.drain(..) {
             for n in p.non_neg_neighbors().filter(|&n| !is_wall(n)) {
                 if seen.insert(n) {
@@ -57,6 +56,11 @@ fn part2(n: i32) -> usize {
     }
 
     seen.len()
+}
+
+pub fn solve(input: &str) -> (i32, usize) {
+    let input = input.parse().unwrap();
+    (part1(input), part2(input))
 }
 
 #[async_std::test]

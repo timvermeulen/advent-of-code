@@ -57,6 +57,11 @@ fn part2(reindeer: &[Reindeer]) -> u32 {
     scores.into_iter().max().unwrap()
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let reindeer = parser().parse_to_end(&input).unwrap();
+    (part1(&reindeer), part2(&reindeer))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 14).await?;

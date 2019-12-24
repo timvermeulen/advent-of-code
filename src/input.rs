@@ -51,11 +51,11 @@ async fn write_input(year: u32, path: String, input: &str) -> async_std::io::Res
 
 #[async_std::test]
 async fn test_input() {
-    let mut input = match get_input(2018, 6).await {
+    match get_input(2018, 6).await {
         Ok(input) => println!("{}", input),
         Err(err) => {
             println!("{:?}", err);
             panic!()
         }
-    };
+    }
 }

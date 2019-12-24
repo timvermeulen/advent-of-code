@@ -1,8 +1,8 @@
 use super::*;
 
-fn part2(input: &str) -> i32 {
+pub fn part2(input: &str) -> i32 {
     let width = input.bytes().position(|b| b == b'\n').unwrap();
-    let mut entrance = Pos { x: width as i32 / 2, y: width as i32 / 2 };
+    let entrance = Pos { x: width as i32 / 2, y: width as i32 / 2 };
 
     let char_at = |Pos { x, y }| input.as_bytes()[x as usize + y as usize * (width + 1)];
     let is_wall = |pos| char_at(pos) == b'#' || pos.manhattan_distance(entrance) == 1;

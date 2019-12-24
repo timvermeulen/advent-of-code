@@ -36,6 +36,11 @@ fn part2(digits: &[u32]) -> u32 {
     suffix.iter().rev().take(8).fold(0, |n, &d| 10 * n + d)
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let digits = parse(&input);
+    (part1(&digits), part2(&digits))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 16).await?;

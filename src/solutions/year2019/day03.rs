@@ -67,7 +67,7 @@ fn parser<'a>() -> impl Parser<&'a str, Output = [Wire; 2]> {
 }
 
 fn part1([wire_a, wire_b]: [&Wire; 2]) -> u32 {
-    let mut breadcrumbs: HashSet<_> = wire_a.iter().collect();
+    let breadcrumbs: HashSet<_> = wire_a.iter().collect();
     wire_b
         .iter()
         .filter(|pos| breadcrumbs.contains(pos))
@@ -77,13 +77,18 @@ fn part1([wire_a, wire_b]: [&Wire; 2]) -> u32 {
 }
 
 fn part2([wire_a, wire_b]: [&Wire; 2]) -> u32 {
-    let mut breadcrumbs: HashMap<_, u32> = wire_a.iter().zip(1..).collect();
+    let breadcrumbs: HashMap<_, u32> = wire_a.iter().zip(1..).collect();
     wire_b
         .iter()
         .zip(1..)
         .filter_map(|(pos, n)| breadcrumbs.get(&pos).map(|m| n + m))
         .min()
         .unwrap()
+}
+
+pub fn solve(input: &str) -> (u32, u32) {
+    let [wire_a, wire_b] = parser().parse_to_end(&input).unwrap();
+    (part1([&wire_a, &wire_b]), part2([&wire_a, &wire_b]))
 }
 
 #[async_std::test]

@@ -64,6 +64,11 @@ fn part2(grid: &[Vec<u32>]) -> u32 {
     max
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let grid = parse(&input);
+    (part1(&grid), part2(&grid))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 9).await?;

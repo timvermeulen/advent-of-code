@@ -64,7 +64,6 @@ fn optimal_ore_cost(
         None => return 1.0,
         Some(x) => x,
     };
-    let x = 1.0 / reaction.output.amount as f64;
     reaction
         .inputs
         .iter()
@@ -87,6 +86,11 @@ fn parser<'a>() -> impl Parser<&'a str, Output = HashMap<Chemical<'a>, Reaction<
     let reaction = chain((inputs, string(" => "), amount))
         .map(|(inputs, _, output)| Reaction { inputs, output });
     reaction.map(|r: Reaction<'a>| (r.output.chemical, r)).collect_sep_by(newline())
+}
+
+pub fn solve(input: &str) -> (i64, i64) {
+    let reactions = parser().parse_to_end(&input).unwrap();
+    (part1(&reactions), part2(&reactions))
 }
 
 #[async_std::test]

@@ -20,7 +20,7 @@ impl Claim {
     }
 }
 
-fn parse(input: String) -> Vec<Claim> {
+fn parse(input: &str) -> Vec<Claim> {
     let id = chain((token('#'), parser::u32()));
     let origin = chain((parser::u32(), token(','), parser::u32()));
     let size = chain((parser::u32(), token('x'), parser::u32()));
@@ -53,10 +53,15 @@ fn part2(claims: &[Claim]) -> u32 {
     claim.id
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let claims = parse(input);
+    (part1(&claims), part2(&claims))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 3).await?;
-    let claims = parse(input);
+    let claims = parse(&input);
     assert_eq!(part1(&claims), 110_389);
     assert_eq!(part2(&claims), 552);
     Ok(())

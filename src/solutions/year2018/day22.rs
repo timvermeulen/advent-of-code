@@ -61,11 +61,11 @@ fn erosion(
     Cache::new(move |&pos, f| {
         let from_geo = |geo| (geo + depth) % 20_183;
         let geo = match pos {
-            Pos::origin() => 0,
+            Pos { x: 0, y: 0 } => 0,
             pos if pos == target => 0,
             Pos { x, y: 0 } => x * 16_807,
             Pos { x: 0, y } => y * 48_271,
-            Pos { x, y } => f(pos.moving_to(Dir::North)) * f(pos.moving_to(Dir::West)),
+            _ => f(pos.moving_to(Dir::North)) * f(pos.moving_to(Dir::West)),
         };
         from_geo(geo)
     })
@@ -83,11 +83,11 @@ fn part2(depth: i32, target: Pos) -> i32 {
     let mut erosion = Cache::new(|&pos, f| {
         let from_geo = |geo| (geo + depth) % 20_183;
         let geo = match pos {
-            Pos::origin() => 0,
+            Pos { x: 0, y: 0 } => 0,
             pos if pos == target => 0,
             Pos { x, y: 0 } => x * 16_807,
             Pos { x: 0, y } => y * 48_271,
-            Pos { x, y } => f(pos.moving_to(Dir::North)) * f(pos.moving_to(Dir::West)),
+            _ => f(pos.moving_to(Dir::North)) * f(pos.moving_to(Dir::West)),
         };
         from_geo(geo)
     });
@@ -116,6 +116,11 @@ fn parser<'a>() -> impl Parser<&'a str, Output = (i32, Pos)> {
     let target = chain((parser::i32(), token(','), parser::i32())).map(|(x, _, y)| Pos { x, y });
     chain((string("depth: "), parser::i32(), string("\ntarget: "), target))
         .map(|(_, depth, _, target)| (depth, target))
+}
+
+pub fn solve(input: &str) -> (i32, i32) {
+    let (depth, target) = parser().parse_to_end(&input).unwrap();
+    (part1(depth, target), part2(depth, target))
 }
 
 #[async_std::test]

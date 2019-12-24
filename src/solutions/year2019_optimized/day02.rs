@@ -9,7 +9,7 @@ fn run(mut memory: Vec<i64>, noun: i64, verb: i64) -> i64 {
     computer.memory[0]
 }
 
-fn solve(input: &str) -> (i64, i64) {
+pub fn solve(input: &str) -> (i64, i64) {
     let memory: Vec<i64> = input.split(',').map(|s| s.parse().unwrap()).collect();
     let base = run(memory.clone(), 0, 0);
     let part1 = run(memory, 12, 2);

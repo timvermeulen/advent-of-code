@@ -24,6 +24,11 @@ fn part2(triples: &[[u32; 3]]) -> u32 {
         .count() as u32
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let triples = parser().parse_to_end(&input).unwrap();
+    (part1(&triples), part2(&triples))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2016, 3).await?;

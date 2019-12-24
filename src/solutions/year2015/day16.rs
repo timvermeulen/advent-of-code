@@ -63,6 +63,11 @@ fn is_match_2(item: Item<'_>) -> bool {
     }
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let sues = parser().parse_to_end(&input).unwrap();
+    (part1(&sues), part2(&sues))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 16).await?;

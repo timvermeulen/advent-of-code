@@ -78,6 +78,11 @@ fn part2(tokens: &[Vec<Token>]) -> u32 {
     tokens.iter().map(|tokens| tokens.iter().fold(4, |n, t| n + t.encoded() - t.code())).sum()
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let tokens = parser().parse_to_end(&input).unwrap();
+    (part1(&tokens), part2(&tokens))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 8).await?;

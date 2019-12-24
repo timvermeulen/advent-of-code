@@ -1,4 +1,5 @@
 use super::*;
+use mask::*;
 use search_algs::*;
 
 // IMPORTANT:
@@ -14,61 +15,11 @@ impl Display for PortalID {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash)]
-struct Mask(u64);
-
-impl Mask {
-    fn new() -> Self {
-        Self(0)
-    }
-
-    fn contains(self, n: usize) -> bool {
-        self.0 & (1 << n) != 0
-    }
-
-    fn insert(&mut self, n: usize) {
-        self.0 |= 1 << n;
-    }
-
-    fn remove(&mut self, n: usize) {
-        self.0 &= !(1 << n);
-    }
-
-    fn len(self) -> u32 {
-        self.0.count_ones()
-    }
-
-    fn is_empty(self) -> bool {
-        self.0 == 0
-    }
-
-    fn first(self) -> Option<usize> {
-        if self.is_empty() {
-            None
-        } else {
-            Some(self.0.trailing_zeros() as usize)
-        }
-    }
-
-    fn iter(mut self) -> impl Iterator<Item = usize> {
-        iter::from_fn(move || {
-            let n = self.first()?;
-            self.remove(n);
-            Some(n)
-        })
-    }
-
-    fn add(&mut self, other: Mask) {
-        self.0 |= other.0
-    }
-}
-
 struct PortalInfo {
-    id: PortalID,
     teleports_to: usize,
     cost_of_teleportation: u32,
     depth_change: i32,
-    accessible_portals: Mask,
+    accessible_portals: Mask<u64>,
 }
 
 struct Data {
@@ -80,7 +31,7 @@ struct Data {
 }
 
 impl Data {
-    fn portals_accessible_from(&self, portal: usize) -> impl Iterator<Item = usize> + '_ {
+    fn portals_accessible_from(&self, portal: usize) -> impl Iterator<Item = u32> + '_ {
         self.portals[portal].accessible_portals.iter()
     }
 
@@ -172,14 +123,12 @@ fn data(input: &str) -> Data {
 
     let num_portals = portals.len();
 
-    let mut portal_info: Vec<_> = portals
-        .iter()
-        .map(|&(id, _, _)| PortalInfo {
-            id,
+    let mut portal_info: Vec<_> = (0..num_portals)
+        .map(|_| PortalInfo {
             teleports_to: 0,
             cost_of_teleportation: 0,
             depth_change: 0,
-            accessible_portals: Mask::new(),
+            accessible_portals: Mask::empty(),
         })
         .collect();
 
@@ -206,10 +155,11 @@ fn data(input: &str) -> Data {
     };
 
     let mut stack = Vec::new();
-    let mut remaining_portals = Mask((1 << num_portals) - 1);
+    let mut remaining_portals = Mask::<u64>((1 << num_portals) - 1);
 
-    while let Some(i) = remaining_portals.first() {
+    while let Some(i) = remaining_portals.iter().next() {
         remaining_portals.remove(i);
+        let i = i as usize;
         let (_id, pos, dir) = portals[i];
 
         stack.clear();
@@ -244,9 +194,10 @@ fn data(input: &str) -> Data {
                     let mut is_portal = false;
 
                     for j in remaining_portals.iter() {
+                        let j = j as usize;
                         if n == portals[j].1 {
                             is_portal = true;
-                            remaining_portals.remove(j);
+                            remaining_portals.remove(j as u32);
                             set_distance(i, j, dist + 1);
                             other_portal = j;
                             only_steps = steps;
@@ -312,8 +263,8 @@ fn data(input: &str) -> Data {
         for j in i + 1..num_portals {
             let dist = distances[i * num_portals + j];
             if dist > 0 {
-                portal_info[i].accessible_portals.insert(j);
-                portal_info[j].accessible_portals.insert(i);
+                portal_info[i].accessible_portals.insert(j as u32);
+                portal_info[j].accessible_portals.insert(i as u32);
             }
         }
     }
@@ -321,6 +272,7 @@ fn data(input: &str) -> Data {
     let mut min_dist = u32::max_value();
     for i in 0..num_portals {
         for j in portal_info[i].accessible_portals.iter() {
+            let j = j as usize;
             if portal_info[i].depth_change == 1 && portal_info[j].depth_change == -1 {
                 min_dist = cmp::min(min_dist, distances[i * num_portals + j]);
             }
@@ -335,6 +287,7 @@ fn part1(data: &Data) -> u32 {
         &data.start,
         |&i| {
             data.portals_accessible_from(i).filter_map(move |j| {
+                let j = j as usize;
                 let dist = data.distance_between(i, j);
                 let sibling = data.sibling_portal_of(j);
                 let cost = data.cost_of(j);
@@ -356,6 +309,7 @@ fn part2(data: &Data) -> u32 {
         &(data.start, 0),
         |&(i, depth)| {
             data.portals_accessible_from(i).filter_map(move |j| {
+                let j = j as usize;
                 let dist = data.distance_between(i, j);
                 let delta = data.depth_change_of(j);
                 let new_depth = depth + delta;
@@ -372,6 +326,11 @@ fn part2(data: &Data) -> u32 {
     )
     .unwrap();
     len
+}
+
+pub fn solve(input: &str) -> (u32, u32) {
+    let data = data(&input);
+    (part1(&data), part2(&data))
 }
 
 #[async_std::test]

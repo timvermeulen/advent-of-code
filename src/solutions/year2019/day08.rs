@@ -27,6 +27,11 @@ fn part2(input: &str) -> String {
     pixels.chunks(WIDTH).flat_map(|row| row.iter().copied().chain(iter::once('\n'))).collect()
 }
 
+pub fn solve(input: &str) -> (usize, String) {
+    (part1(input), part2(input))
+}
+
+#[cfg(test)]
 const FHJUL: &str = "\
 **** *  *   ** *  * *    
 *    *  *    * *  * *    

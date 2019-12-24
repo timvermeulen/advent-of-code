@@ -74,6 +74,11 @@ fn part2(json: &JSON<'_>) -> i32 {
     json.non_red_sum()
 }
 
+pub fn solve(input: &str) -> (i32, i32) {
+    let json = parser().parse_to_end(&input).unwrap();
+    (part1(&json), part2(&json))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 12).await?;

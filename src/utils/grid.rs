@@ -52,13 +52,14 @@ impl<T: Clone> IndexMut<Pos> for Grid<T> {
 
 impl<T: Debug> Debug for Grid<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let (xs, ys) = match (try {
+        let ranges = try {
             let min_x = self.elements.keys().map(|p| p.x).min()?;
             let max_x = self.elements.keys().map(|p| p.x).max()?;
             let min_y = self.elements.keys().map(|p| p.y).min()?;
             let max_y = self.elements.keys().map(|p| p.y).max()?;
             (min_x - 1..=max_x + 1, min_y - 1..=max_y + 1)
-        }) {
+        };
+        let (xs, ys) = match ranges {
             Some(x) => x,
             None => return write!(f, "an empty grid"),
         };

@@ -107,6 +107,11 @@ fn part2(records: &[Record]) -> u32 {
     id * minute
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let records = parse(&input);
+    (part1(&records), part2(&records))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 4).await?;

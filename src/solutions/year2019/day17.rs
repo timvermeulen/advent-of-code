@@ -70,7 +70,8 @@ fn find_routines(segments: &[Segment]) -> (Vec<usize>, [&[Segment]; 3]) {
     (order, routines)
 }
 
-fn solve(memory: Vec<i64>) -> (i32, i64) {
+pub fn solve(input: &str) -> (i32, i64) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     let mut robot = Computer::new(memory);
 
     let mut grid = Grid::new(false);
@@ -151,8 +152,7 @@ fn solve(memory: Vec<i64>) -> (i32, i64) {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 17).await?;
-    let memory = intcode::parser().parse_to_end(&input).unwrap();
-    assert_eq!(solve(memory), (2080, 742_673));
+    assert_eq!(solve(&input), (2080, 742_673));
     Ok(())
 }
 
@@ -166,9 +166,6 @@ mod benches {
     #[bench]
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 17)).unwrap();
-        b.iter(|| {
-            let memory = intcode::parser().parse_to_end(&input).unwrap();
-            solve(memory)
-        });
+        b.iter(|| solve(&input));
     }
 }

@@ -37,6 +37,11 @@ fn part2(presents: &[Present]) -> u32 {
     presents.iter().map(|p| p.ribbon()).sum()
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let presents = parser().parse_to_end(&input).unwrap();
+    (part1(&presents), part2(&presents))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 2).await?;

@@ -1,5 +1,3 @@
-use super::*;
-
 const WIDTH: usize = 25;
 const HEIGHT: usize = 6;
 const SIZE: usize = WIDTH * HEIGHT;
@@ -43,6 +41,13 @@ const CHARS: [u8; 32] = [
 fn identify([a, b, c, d, e]: [bool; 5]) -> u8 {
     CHARS[a as usize + 2 * b as usize + 4 * c as usize + 8 * d as usize + 16 * e as usize]
 }
+
+pub fn solve(input: &str) -> (usize, [u8; 5]) {
+    (part1(input), part2(input))
+}
+
+#[cfg(test)]
+use super::*;
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {

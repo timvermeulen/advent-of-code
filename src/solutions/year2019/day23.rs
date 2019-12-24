@@ -1,7 +1,8 @@
 use super::*;
 use intcode::prelude::*;
 
-fn solve(memory: &[i64]) -> (i64, i64) {
+pub fn solve(input: &str) -> (i64, i64) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     let mut queues: Vec<_> = (0..50).map(|_| VecDeque::new()).collect();
     let mut comps: Vec<_> = (0..50).map(|_| Computer::new(memory.to_owned())).collect();
 
@@ -60,8 +61,7 @@ fn solve(memory: &[i64]) -> (i64, i64) {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 23).await?;
-    let memory = intcode::parser().parse_to_end(&input).unwrap();
-    assert_eq!(solve(&memory), (23_213, 17_874));
+    assert_eq!(solve(&input), (23_213, 17_874));
     Ok(())
 }
 
@@ -75,9 +75,6 @@ mod benches {
     #[bench]
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 23)).unwrap();
-        b.iter(|| {
-            let memory = intcode::parser().parse_to_end(&input).unwrap();
-            solve(&memory)
-        });
+        b.iter(|| solve(&input));
     }
 }

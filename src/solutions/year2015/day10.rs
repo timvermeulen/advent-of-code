@@ -1,6 +1,5 @@
 use super::*;
 use itertools::Itertools;
-use std::iter::once;
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<u8>> {
     parser::digit().map(|d| d as u8).collect_many()
@@ -30,6 +29,11 @@ fn part2(digits: &[u8]) -> usize {
         vec = look_and_say(&vec);
     }
     vec.len()
+}
+
+pub fn solve(input: &str) -> (usize, usize) {
+    let digits = parser().parse_to_end(&input).unwrap();
+    (part1(&digits), part2(&digits))
 }
 
 #[test]

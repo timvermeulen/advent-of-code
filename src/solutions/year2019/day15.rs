@@ -21,11 +21,10 @@ impl Drone {
     }
 }
 
-fn solve(memory: Vec<i64>) -> (usize, usize) {
+pub fn solve(input: &str) -> (usize, usize) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
     let mut drone = Drone::new(memory);
-
     let mut pos = Pos::origin();
-    let mut distance = 0;
 
     let mut moves = Vec::new();
     let mut states = Vec::new();
@@ -88,8 +87,7 @@ fn solve(memory: Vec<i64>) -> (usize, usize) {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 15).await?;
-    let memory = intcode::parser().parse_to_end(&input).unwrap();
-    assert_eq!(solve(memory), (270, 364));
+    assert_eq!(solve(&input), (270, 364));
     Ok(())
 }
 
@@ -103,9 +101,6 @@ mod benches {
     #[bench]
     fn bench_part1(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 15)).unwrap();
-        b.iter(|| {
-            let memory = intcode::parser().parse_to_end(&input).unwrap();
-            solve(memory)
-        });
+        b.iter(|| solve(&input));
     }
 }

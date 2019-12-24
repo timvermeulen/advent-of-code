@@ -16,12 +16,13 @@ pub use std::{
     ops::{Index, IndexMut, Range},
 };
 
-mod year2015;
-mod year2016;
-mod year2017;
 pub mod search_algs {
     pub use pathfinding::prelude::{astar, bfs, dfs, dijkstra};
 }
-mod year2018;
-mod year2019;
-mod year2019_optimized;
+
+pub mod year2015;
+pub mod year2016;
+pub mod year2017;
+pub mod year2018;
+pub mod year2019;
+pub mod year2019_optimized;

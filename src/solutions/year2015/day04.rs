@@ -1,4 +1,3 @@
-use super::*;
 use crypto::{digest::Digest, md5};
 
 fn find_hash(key: &str, lower_bound: usize, mut condition: impl FnMut([u8; 16]) -> bool) -> usize {
@@ -25,6 +24,14 @@ fn part1(key: &str) -> usize {
 fn part2(key: &str, lower: usize) -> usize {
     find_hash(key, lower, |output| output[0] == 0 && output[1] == 0 && output[2] == 0)
 }
+
+pub fn solve(input: &str) -> (usize, usize) {
+    let part1 = part1(input);
+    (part1, part2(input, part1))
+}
+
+#[cfg(test)]
+use super::*;
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {

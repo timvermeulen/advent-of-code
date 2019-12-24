@@ -92,6 +92,11 @@ fn part2(instructions: &HashMap<Wire, Source>) -> Value {
     cache.get("a".into())
 }
 
+pub fn solve(input: &str) -> (Value, Value) {
+    let instructions = parser().parse_to_end(&input).unwrap();
+    (part1(&instructions), part2(&instructions))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 7).await?;

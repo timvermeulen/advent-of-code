@@ -63,6 +63,11 @@ fn count2(containers: &[u32], liters: u32) -> Option<(u32, u32)> {
     })
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let containers = parser().parse_to_end(&input).unwrap();
+    (part1(&containers), part2(&containers))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 17).await?;

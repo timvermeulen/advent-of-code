@@ -57,8 +57,6 @@ fn part1(instructions: &[Instruction]) -> i32 {
 }
 
 fn part2(instructions: &[Instruction]) -> i32 {
-    use std::collections::HashSet;
-
     let mut set = HashSet::new();
     let mut location = (0_i32, 0_i32);
     let mut direction = Direction::Up;
@@ -81,6 +79,11 @@ fn part2(instructions: &[Instruction]) -> i32 {
     }
 
     unreachable!()
+}
+
+pub fn solve(input: &str) -> (i32, i32) {
+    let instructions = parser().parse_to_end(&input).unwrap();
+    (part1(&instructions), part2(&instructions))
 }
 
 #[async_std::test]

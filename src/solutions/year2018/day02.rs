@@ -31,6 +31,11 @@ fn part2(ids: &[&str]) -> String {
     a.chars().zip(b.chars()).filter(|(a, b)| a == b).map(|(a, _)| a).collect()
 }
 
+pub fn solve(input: &str) -> (u32, String) {
+    let ids = parser().parse_to_end(&input).unwrap();
+    (part1(&ids), part2(&ids))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 2).await?;

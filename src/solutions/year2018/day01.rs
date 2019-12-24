@@ -1,8 +1,8 @@
 use super::*;
 
-fn parse(input: String) -> Vec<i32> {
+fn parse(input: &str) -> Vec<i32> {
     let number = token('+').optional().followed_by(parser::i32()).map(|(_, x)| x);
-    number.collect_sep_by(token('\n')).parse_to_end(&input).unwrap()
+    number.collect_sep_by(token('\n')).parse_to_end(input).unwrap()
 }
 
 fn part1(frequencies: &[i32]) -> i32 {
@@ -23,10 +23,15 @@ fn part2(frequencies: &[i32]) -> i32 {
         .unwrap()
 }
 
+pub fn solve(input: &str) -> (i32, i32) {
+    let frequencies = parse(input);
+    (part1(&frequencies), part2(&frequencies))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2018, 1).await?;
-    let frequencies = parse(input);
+    let frequencies = parse(&input);
     assert_eq!(part1(&frequencies), 516);
     assert_eq!(part2(&frequencies), 71892);
     Ok(())

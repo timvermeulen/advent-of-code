@@ -1,5 +1,3 @@
-use super::*;
-
 fn are_opposites(x: char, y: char) -> bool {
     x.eq_ignore_ascii_case(&y) && x != y
 }
@@ -31,6 +29,13 @@ fn part2(input: &str) -> u32 {
         .min()
         .unwrap()
 }
+
+pub fn solve(input: &str) -> (u32, u32) {
+    (part1(input), part2(input))
+}
+
+#[cfg(test)]
+use super::*;
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {

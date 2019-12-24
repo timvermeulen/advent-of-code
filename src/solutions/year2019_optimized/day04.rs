@@ -52,6 +52,11 @@ fn part1(range: Range<u32>) -> u32 {
     up_to(range.end) - up_to(range.start)
 }
 
+pub fn solve(input: &str) -> u32 {
+    let range = parser().parse_to_end(&input).unwrap();
+    part1(range)
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 4).await?;

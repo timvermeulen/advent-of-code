@@ -1,5 +1,4 @@
 use super::*;
-use noisy_float::prelude::*;
 
 #[derive(PartialEq, Eq, Hash, Copy, Clone, Debug)]
 struct Point {
@@ -93,7 +92,7 @@ fn part1(asteroids: &Asteroids) -> (Point, usize) {
     let max = size as i32 - 1;
     let min = -max;
 
-    let mut gcd: Vec<i32> =
+    let gcd: Vec<i32> =
         (0..size).flat_map(|y| (0..size).map(move |x| gcd(x as i32, y as i32))).collect();
 
     let mut normalized = Grid::<Point>::new(Point { x: 0, y: 0 }, asteroids.side_len);
@@ -164,6 +163,12 @@ fn part2(asteroids: &Asteroids, laser: Point) -> i32 {
     });
     let asteroid = visible[199];
     100 * asteroid.x + asteroid.y
+}
+
+pub fn solve(input: &str) -> (usize, i32) {
+    let asteroids = parse(&input);
+    let (laser, count) = part1(&asteroids);
+    (count, part2(&asteroids, laser))
 }
 
 #[async_std::test]

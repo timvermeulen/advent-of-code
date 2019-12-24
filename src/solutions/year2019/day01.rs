@@ -20,6 +20,11 @@ fn part2(modules: &[u32]) -> u32 {
     modules.iter().map(|&m| fuel(m)).sum()
 }
 
+pub fn solve(input: &str) -> (u32, u32) {
+    let modules = parser().parse_to_end(&input).unwrap();
+    (part1(&modules), part2(&modules))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 1).await?;

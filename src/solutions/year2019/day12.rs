@@ -98,6 +98,11 @@ fn cycle_len(mut axes: [Axis; 4]) -> u64 {
     unreachable!()
 }
 
+pub fn solve(input: &str) -> (i32, u64) {
+    let moons = parser().parse_to_end(&input).unwrap();
+    (part1(moons), part2(moons))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 12).await?;

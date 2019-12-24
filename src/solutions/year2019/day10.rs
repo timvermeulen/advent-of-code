@@ -88,6 +88,12 @@ fn part2(mut asteroids: Asteroids, laser: Point) -> i32 {
     })
 }
 
+pub fn solve(input: &str) -> (usize, i32) {
+    let asteroids = parse(&input);
+    let (laser, count) = part1(&asteroids);
+    (count, part2(asteroids, laser))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 10).await?;

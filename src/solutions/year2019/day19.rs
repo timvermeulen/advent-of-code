@@ -37,6 +37,11 @@ fn part2(memory: &[i64]) -> i64 {
     }
 }
 
+pub fn solve(input: &str) -> (u32, i64) {
+    let memory = intcode::parser().parse_to_end(&input).unwrap();
+    (part1(&memory), part2(&memory))
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 19).await?;
