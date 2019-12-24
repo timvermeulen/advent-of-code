@@ -1,8 +1,9 @@
-mod cache;
-mod digits;
-mod grid;
-mod pos;
-mod useful_parsers;
+pub mod cache;
+pub mod digits;
+pub mod grid;
+pub mod mask;
+pub mod pos;
+pub mod useful_parsers;
 
 pub mod intcode;
 

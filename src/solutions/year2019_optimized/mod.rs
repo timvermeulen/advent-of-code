@@ -8,3 +8,4 @@ mod day10;
 mod day12;
 mod day18;
 mod day20;
+mod day24;
