@@ -16,17 +16,26 @@ pub trait Masked:
     + Copy
 {
     fn trailing_zeros(self) -> u32;
+    fn count_ones(self) -> u32;
 }
 
 impl Masked for u32 {
     fn trailing_zeros(self) -> u32 {
         self.trailing_zeros()
     }
+
+    fn count_ones(self) -> u32 {
+        self.count_ones()
+    }
 }
 
 impl Masked for u64 {
     fn trailing_zeros(self) -> u32 {
         self.trailing_zeros()
+    }
+
+    fn count_ones(self) -> u32 {
+        self.count_ones()
     }
 }
 
@@ -49,8 +58,24 @@ where
         self.0 &= !(T::one() << i);
     }
 
+    pub fn add(&mut self, other: Self) {
+        self.0 |= other.0;
+    }
+
+    pub fn contains(self, i: u32) -> bool {
+        (self.0 >> i) & T::one() == T::one()
+    }
+
+    pub fn intersects(self, other: Self) -> bool {
+        (self.0 & other.0) != T::zero()
+    }
+
     pub fn is_empty(self) -> bool {
         self == Self::empty()
+    }
+
+    pub fn len(self) -> u32 {
+        self.0.count_ones()
     }
 
     pub fn iter(mut self) -> impl Iterator<Item = u32> {
