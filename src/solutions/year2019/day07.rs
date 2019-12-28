@@ -33,14 +33,12 @@ fn part2(memory: &[i64]) -> i64 {
 fn run_part2(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amp = || Computer::new(memory.to_owned());
     let mut amps = [amp(), amp(), amp(), amp(), amp()];
-    let mut settings = settings.iter().copied();
-
+    for i in 0..5 {
+        amps[i].step_with(settings[i]);
+    }
     let mut value = 0;
     loop {
         for amp in &mut amps {
-            if let Some(setting) = settings.next() {
-                amp.step_with(setting);
-            }
             value = amp.step_with(value).output().unwrap_or(value);
         }
         if amps[4].is_halted() {
