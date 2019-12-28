@@ -52,16 +52,97 @@ fn part1(range: Range<u32>) -> u32 {
     up_to(range.end) - up_to(range.start)
 }
 
-pub fn solve(input: &str) -> u32 {
+fn part2(range: Range<u32>) -> u32 {
+    let range = range.start as usize..range.end as usize;
+    let digits = [
+        range.start / 100_000,
+        (range.start / 10_000) % 10,
+        (range.start / 1000) % 10,
+        (range.start / 100) % 10,
+        (range.start / 10) % 10,
+        range.start % 10,
+    ];
+
+    let mut n = range.end;
+    let mut count = 0;
+    let mut freq = [0; 10];
+    let mut flag = true;
+    for a in digits[0]..10 {
+        let diff = a * 100_000;
+        if n < diff {
+            break;
+        }
+        n -= diff;
+        freq[a] += 1;
+        for b in cmp::max(a, if flag { digits[1] } else { 0 })..10 {
+            let diff = b * 10_000;
+            if n < diff {
+                break;
+            }
+            n -= diff;
+            freq[b] += 1;
+            for c in cmp::max(b, if flag { digits[2] } else { 0 })..10 {
+                let diff = c * 1000;
+                if n < diff {
+                    break;
+                }
+                n -= diff;
+                freq[c] += 1;
+                for d in cmp::max(c, if flag { digits[3] } else { 0 })..10 {
+                    let diff = d * 100;
+                    if n < diff {
+                        break;
+                    }
+                    n -= diff;
+                    freq[d] += 1;
+                    for e in cmp::max(d, if flag { digits[4] } else { 0 })..10 {
+                        let diff = e * 10;
+                        if n < diff {
+                            break;
+                        }
+                        n -= diff;
+                        freq[e] += 1;
+                        for f in cmp::max(e, if flag { digits[5] } else { 0 })..10 {
+                            let diff = f;
+                            if n < diff {
+                                break;
+                            }
+                            n -= diff;
+                            freq[f] += 1;
+                            if freq.contains(&2) {
+                                count += 1;
+                            }
+                            n += diff;
+                            freq[f] -= 1;
+                        }
+                        n += diff;
+                        freq[e] -= 1;
+                        flag = false;
+                    }
+                    n += diff;
+                    freq[d] -= 1;
+                }
+                n += diff;
+                freq[c] -= 1;
+            }
+            n += diff;
+            freq[b] -= 1;
+        }
+        n += diff;
+        freq[a] -= 1;
+    }
+    count
+}
+
+pub fn solve(input: &str) -> (u32, u32) {
     let range = parser().parse_to_end(&input).unwrap();
-    part1(range)
+    (part1(range.clone()), part2(range))
 }
 
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 4).await?;
-    let range = parser().parse_to_end(&input).unwrap();
-    assert_eq!(part1(range), 1767);
+    assert_eq!(solve(&input), (1767, 1192));
     Ok(())
 }
 
@@ -75,9 +156,6 @@ mod benches {
     #[bench]
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 4)).unwrap();
-        b.iter(|| {
-            let range = parser().parse_to_end(&input).unwrap();
-            part1(range)
-        });
+        b.iter(|| solve(&input));
     }
 }
