@@ -1,54 +1,50 @@
 use super::bits;
-use std::ops::{Index, IndexMut};
+use std::{
+    cmp,
+    ops::{Index, IndexMut},
+};
 
 const NUM_PHASES: usize = 100;
-const INPUT_LEN: usize = 650;
+const N: usize = 650;
 
-fn part1(digits: &[u32]) -> u32 {
-    let mut array = [0; INPUT_LEN];
-    for i in 0..INPUT_LEN {
-        array[i] = digits[i];
-    }
+fn part1(mut digits: [u32; N]) -> u32 {
+    let mut partial_sums = [0; N + 1];
 
     for _ in 0..NUM_PHASES {
-        let mut new = [0; INPUT_LEN];
+        for i in 0..N {
+            partial_sums[i + 1] = partial_sums[i] + digits[i];
+        }
 
-        for i in 0..INPUT_LEN {
+        for (i, digit) in digits.iter_mut().enumerate() {
             let chain_len = i + 1;
             let neg_offset = 2 * chain_len;
             let cycle_len = 2 * neg_offset;
 
-            let positive: i32 = (i..)
+            let positive: u32 = (i..N)
                 .step_by(cycle_len)
-                .flat_map(|i| (i..i + chain_len))
-                .take_while(|&i| i < digits.len())
-                .map(|i| unsafe { *array.get_unchecked(i) } as i32)
+                .map(|i| partial_sums[cmp::min(N, i + chain_len)] - partial_sums[i])
                 .sum();
 
-            let negative: i32 = (i + neg_offset..)
+            let negative: u32 = (i + neg_offset..N)
                 .step_by(cycle_len)
-                .flat_map(|i| (i..i + chain_len))
-                .take_while(|&i| i < digits.len())
-                .map(|i| unsafe { *array.get_unchecked(i) } as i32)
+                .map(|i| partial_sums[cmp::min(N, i + chain_len)] - partial_sums[i])
                 .sum();
 
-            new[i] = (positive - negative).abs() as u32 % 10;
+            *digit = (positive as i32 - negative as i32).abs() as u32 % 10;
         }
-
-        array = new;
     }
 
-    array[..8].iter().fold(0, |n, &d| 10 * n + d)
+    digits[..8].iter().fold(0, |n, &d| 10 * n + d)
 }
 
 // see https://github.com/pengi/advent_of_code/blob/master/2019/non_excel/day16p2.py
-fn part2(digits: &[u32]) -> u32 {
+fn part2(digits: [u32; N]) -> u32 {
     let offset = digits[..7].iter().fold(0, |n, &d| 10 * n + d) as usize;
-    let suffix_len = digits.len() * 10_000 - offset;
+    let suffix_len = N * 10_000 - offset;
     let steps = suffix_len - 8;
-    let batches = steps / digits.len();
+    let batches = steps / N;
 
-    let mut transition = Transition::new(digits);
+    let mut transition = Transition::new(&digits);
     let mut phases = Phases::zero();
 
     for bit in bits(batches) {
@@ -58,9 +54,9 @@ fn part2(digits: &[u32]) -> u32 {
         transition.double();
     }
 
-    let digit_at = |i: usize| digits[digits.len() - 1 - i % digits.len()];
+    let digit_at = |i: usize| digits[N - 1 - i % N];
 
-    for i in batches * digits.len()..steps {
+    for i in batches * N..steps {
         phases.step(digit_at(i));
     }
 
@@ -119,7 +115,7 @@ struct Transition {
 }
 
 impl Transition {
-    fn new(digits: &[u32]) -> Self {
+    fn new(digits: &[u32; N]) -> Self {
         let mut base_affect = Phases::zero();
         for &digit in digits.iter().rev() {
             base_affect.step(digit);
@@ -158,8 +154,11 @@ impl Transition {
 }
 
 pub fn solve(input: &str) -> (u32, u32) {
-    let digits: Vec<u32> = input.chars().map(|c| c.to_digit(10).unwrap()).collect();
-    (part1(&digits), part2(&digits))
+    let mut digits = [0; N];
+    for i in 0..N {
+        digits[i] = (input.as_bytes()[i] - b'0') as u32;
+    }
+    (part1(digits), part2(digits))
 }
 
 #[cfg(test)]
