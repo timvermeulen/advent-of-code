@@ -10,14 +10,12 @@ WALK
 ";
 
 const PART2: &str = "\
-NOT A J
-NOT T T
+NOT H T
+OR C T
 AND B T
-AND C T
-NOT T T
-AND D T
-AND H T
-OR T J
+AND A T
+NOT T J
+AND D J
 RUN
 ";
 
