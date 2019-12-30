@@ -37,3 +37,15 @@ macro_rules! iter {
 }
 
 pub use iter;
+
+pub fn bits(mut n: usize) -> impl Iterator<Item = bool> {
+    std::iter::from_fn(move || {
+        if n == 0 {
+            None
+        } else {
+            let bit = n % 2 == 1;
+            n /= 2;
+            Some(bit)
+        }
+    })
+}
