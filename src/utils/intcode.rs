@@ -9,7 +9,7 @@ pub fn parser<'a>() -> impl Parser<&'a str, Output = Vec<i64>> {
     parser::i64().collect_sep_by(token(','))
 }
 
-#[derive(Clone, Eq, PartialEq, Hash)]
+#[derive(Clone, Eq, PartialEq, Hash, Debug)]
 pub struct Computer {
     pub memory: Vec<i64>,
     pub pc: i64,
@@ -84,7 +84,6 @@ impl Computer {
         loop {
             match self.state {
                 State::Halted => {
-                    println!("warning: the program has been halted before");
                     self.state = State::Idle;
                 }
                 State::WaitingForInput(mode) => {
@@ -105,26 +104,31 @@ impl Computer {
 
             match opcode {
                 Opcode::Add => {
-                    let sum = params.read() + params.read();
-                    params.write(sum);
+                    let a = params.read();
+                    let b = params.read();
+                    params.write(a + b);
                 }
                 Opcode::Multiply => {
-                    let product = params.read() * params.read();
-                    params.write(product);
+                    let a = params.read();
+                    let b = params.read();
+                    params.write(a * b);
                 }
                 Opcode::Input => self.state = State::WaitingForInput(params.next_mode()),
-                Opcode::Output => return Interrupt::Output(params.read()),
+                Opcode::Output => {
+                    let output = params.read();
+                    return Interrupt::Output(output);
+                }
                 Opcode::JumpTrue => {
-                    let condition = params.read() != 0;
+                    let x = params.read();
                     let address = params.read();
-                    if condition {
+                    if x != 0 {
                         self.pc = address;
                     }
                 }
                 Opcode::JumpFalse => {
-                    let condition = params.read() == 0;
+                    let x = params.read();
                     let address = params.read();
-                    if condition {
+                    if x == 0 {
                         self.pc = address;
                     }
                 }
