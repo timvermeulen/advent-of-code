@@ -41,7 +41,7 @@ pub fn solve(input: &str) -> (i64, i64) {
                 _ => signal * 2,
             })
         });
-        part2_max = cmp::max(part1_max, result);
+        part2_max = cmp::max(part2_max, result);
     }
 
     (part1_max, part2_max)
