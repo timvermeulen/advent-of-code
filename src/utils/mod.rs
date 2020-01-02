@@ -5,6 +5,7 @@ pub mod mask;
 pub mod pos;
 pub mod useful_parsers;
 
+pub mod fast_intcode;
 pub mod intcode;
 
 pub use cache::*;
