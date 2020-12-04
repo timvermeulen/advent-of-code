@@ -3,6 +3,7 @@ pub mod digits;
 pub mod grid;
 pub mod mask;
 pub mod pos;
+pub mod search;
 pub mod useful_parsers;
 
 pub mod fast_intcode;
@@ -12,6 +13,7 @@ pub use cache::*;
 pub use digits::*;
 pub use grid::*;
 pub use pos::*;
+pub use search::*;
 pub use useful_parsers::*;
 
 use std::{collections::HashMap, hash::Hash};

@@ -1,17 +1,19 @@
 use super::*;
-use intcode::prelude::*;
+use fast_intcode::*;
 
 #[derive(Clone)]
 struct Droid {
     comp: Computer,
 }
 
-fn dir_string(dir: Dir) -> &'static str {
-    match dir {
-        Dir::North => "north",
-        Dir::South => "south",
-        Dir::West => "west",
-        Dir::East => "east",
+impl Dir {
+    fn as_string(self) -> &'static str {
+        match self {
+            Self::North => "north",
+            Self::South => "south",
+            Self::West => "west",
+            Self::East => "east",
+        }
     }
 }
 
@@ -21,11 +23,11 @@ impl Droid {
     }
 
     fn log_and_move_to(&mut self, dir: Dir) -> String {
-        self.log_and_run_with(dir_string(dir))
+        self.log_and_run_with(dir.as_string())
     }
 
     fn move_to(&mut self, dir: Dir) {
-        self.run_with_and_ignore_output(dir_string(dir));
+        self.run_with_and_ignore_output(dir.as_string());
     }
 
     fn take(&mut self, item: &str) {
@@ -60,6 +62,14 @@ impl Droid {
     }
 }
 
+// fn log<T>(label: &str, f: impl FnOnce() -> T) -> T {
+//     use std::time::Instant;
+//     let start = Instant::now();
+//     let res = f();
+//     println!("{}, time spent: {:?}", label, start.elapsed());
+//     res
+// }
+
 pub fn solve(input: &str) -> u32 {
     let memory = intcode::parser().parse_to_end(&input).unwrap();
     let mut droid = Droid::new(memory);
@@ -73,10 +83,12 @@ pub fn solve(input: &str) -> u32 {
         ["infinite loop", "photons", "molten lava", "escape pod", "giant electromagnet"];
 
     while let Some((dir, dist)) = stack.pop() {
-        // backtracking
-        moves.drain(dist..).rev().for_each(|dir: Dir| {
-            droid.move_to(dir.opposite());
-        });
+        if dist < moves.len() {
+            // backtracking
+            moves.drain(dist..).rev().for_each(|dir: Dir| {
+                droid.move_to(dir.opposite());
+            })
+        }
 
         let output = match dir {
             None => droid.run(),
@@ -90,7 +102,7 @@ pub fn solve(input: &str) -> u32 {
 
         if output.starts_with("\n\n\n== Security") {
             let final_dir = Dir::all()
-                .find(|&dir| back != Some(dir) && output.contains(dir_string(dir)))
+                .find(|&dir| back != Some(dir) && output.contains(dir.as_string()))
                 .unwrap();
             moves_to_checkpoint = Some((moves.clone(), final_dir));
             continue;
@@ -111,7 +123,7 @@ pub fn solve(input: &str) -> u32 {
         }
 
         for next_dir in Dir::all() {
-            if back != Some(next_dir) && output.contains(dir_string(next_dir)) {
+            if back != Some(next_dir) && output.contains(next_dir.as_string()) {
                 stack.push((Some(next_dir), moves.len()));
             }
         }
@@ -128,34 +140,78 @@ pub fn solve(input: &str) -> u32 {
         droid.move_to(dir);
     });
 
-    items.sort_by_key(|item| item.len());
+    #[derive(Debug)]
+    enum TestResult {
+        Passcode(u32),
+        TooHeavy,
+        TooLight,
+    }
 
-    for round in 0.. {
+    let attempt = |droid: &mut Droid| {
         let output = droid.log_and_move_to(dir);
-        if !output.ends_with("Command?\n") {
+        if output.ends_with("Command?\n") {
+            if output.contains("heavier") {
+                TestResult::TooLight
+            } else {
+                TestResult::TooHeavy
+            }
+        } else {
             let passcode = output
                 .chars()
                 .skip_while(|&c| !c.is_digit(10))
                 .take_while(|&c| c.is_digit(10))
                 .map(|c| c.to_digit(10).unwrap())
                 .fold(0, |n, d| 10 * n + d);
-            return passcode;
+            TestResult::Passcode(passcode)
         }
+    };
 
-        // see https://en.wikipedia.org/wiki/Gray_code
-        for (i, item) in items.iter().enumerate() {
-            let drop = (1 << i) - 1;
-            let take = drop + (1 << (i + 1));
-            match round % (1 << (i + 2)) {
-                x if x == drop => droid.drop(&item),
-                x if x == take => droid.take(&item),
-                _ => continue,
-            };
-            break;
-        }
+    items.sort_by_key(|item| item.len());
+
+    let mut no_items = droid.clone();
+    for item in &items {
+        no_items.drop(item);
     }
 
-    unreachable!()
+    loop {
+        let mut required = [false; 8];
+        for i in 0..items.len() {
+            let mut clone = droid.clone();
+            clone.drop(&items[i]);
+            match attempt(&mut clone) {
+                TestResult::Passcode(code) => return code,
+                TestResult::TooHeavy => {}
+                TestResult::TooLight => {
+                    no_items.take(&items[i]);
+                    required[i] = true;
+                }
+            }
+        }
+        for i in (0..8).rev() {
+            if required[i] {
+                items.swap_remove(i);
+            }
+        }
+
+        let mut too_heavy = [false; 8];
+        for i in 0..items.len() {
+            let mut clone = no_items.clone();
+            clone.take(&items[i]);
+            match attempt(&mut clone) {
+                TestResult::Passcode(code) => return code,
+                TestResult::TooHeavy => {
+                    droid.drop(&items[i]);
+                    too_heavy[i] = true;
+                }
+                TestResult::TooLight => {}
+            }
+        }
+        for i in (0..8).rev() {
+            if too_heavy[i] {
+                items.swap_remove(i);
+            }
+        }
+    }
 }
 
 #[async_std::test]

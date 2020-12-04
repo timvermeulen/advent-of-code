@@ -209,6 +209,11 @@ pub fn solve(input: &str) -> (i32, i32) {
     (part1(&data), part2(&data))
 }
 
+pub fn solve_part1(input: &str) -> i32 {
+    let data = data(&input);
+    part1(&data)
+}
+
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 18).await?;

@@ -1,5 +1,5 @@
 use super::*;
-use intcode::prelude::*;
+use fast_intcode::*;
 
 fn part1(arcade: &mut Computer) -> u32 {
     let mut block_count = 0;
@@ -18,7 +18,6 @@ fn part2(mut arcade: Computer) -> i64 {
     arcade.memory[0] = 2;
 
     let mut ball_x: i64 = 0;
-    let mut ball_y: i64 = 0;
     let mut paddle_x: i64 = 0;
     let mut output = 0;
 
@@ -31,15 +30,11 @@ fn part2(mut arcade: Computer) -> i64 {
         let z = arcade.step().unwrap();
 
         if x == -1 {
-            println!("{} points, ball_x = {},{}", z - output, ball_x, ball_y);
             output = z;
         } else {
             match z {
                 3 => paddle_x = x,
-                4 => {
-                    ball_x = x;
-                    ball_y = _y.unwrap();
-                }
+                4 => ball_x = x,
                 _ => {}
             };
         }
@@ -62,16 +57,16 @@ async fn test() -> Result<(), InputError> {
     Ok(())
 }
 
-// #[cfg(test)]
-// mod benches {
-//     extern crate test;
+#[cfg(test)]
+mod benches {
+    extern crate test;
 
-//     use super::*;
-//     use test::Bencher;
+    use super::*;
+    use test::Bencher;
 
-//     #[bench]
-//     fn bench(b: &mut Bencher) {
-//         let input = futures::executor::block_on(get_input(2019, 13)).unwrap();
-//         b.iter(|| solve(&input));
-//     }
-// }
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 13)).unwrap();
+        b.iter(|| solve(&input));
+    }
+}

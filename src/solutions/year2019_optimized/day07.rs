@@ -1,5 +1,5 @@
 use super::*;
-use intcode::prelude::*;
+use fast_intcode::*;
 use permutohedron::Heap;
 
 pub fn solve(input: &str) -> (i64, i64) {
@@ -11,17 +11,23 @@ pub fn solve(input: &str) -> (i64, i64) {
     let mut part2 = [[0; 10]; 5];
 
     for i in 0..5 {
-        let output = computer.step_with(128).unwrap();
+        computer.write_input(128);
+        let output = computer.step().unwrap();
         part1[i] = (output / 128, output % 128);
+        computer.step();
         computer.step();
     }
 
     for i in 0..5 {
         for j in 0..10 {
-            let output = computer.step_with(0).unwrap();
+            computer.write_input(0);
+            let output = computer.step().unwrap();
             part2[i][j] = output;
+            computer.step();
         }
-        computer.step();
+        if i != 4 {
+            computer.step();
+        }
     }
 
     let mut part1_max = 0;

@@ -38,9 +38,7 @@ pub fn solve(input: &str) -> (usize, usize) {
 #[async_std::test]
 async fn test() -> Result<(), InputError> {
     let input = get_input(2019, 6).await?;
-    let orbits = parser().parse_to_end(&input).unwrap();
-    assert_eq!(part1(&orbits), 227_612);
-    assert_eq!(part2(&orbits), 454);
+    assert_eq!(solve(&input), (227_612, 454));
     Ok(())
 }
 
@@ -54,9 +52,6 @@ mod benches {
     #[bench]
     fn bench(b: &mut Bencher) {
         let input = futures::executor::block_on(get_input(2019, 6)).unwrap();
-        b.iter(|| {
-            let orbits = parser().parse_to_end(&input).unwrap();
-            (part1(&orbits), part2(&orbits))
-        });
+        b.iter(|| solve(&input));
     }
 }

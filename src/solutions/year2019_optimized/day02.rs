@@ -1,5 +1,6 @@
 use super::*;
-use intcode::prelude::*;
+use fast_intcode::*;
+// use intcode::prelude::*;
 
 fn run(mut memory: Vec<i64>, noun: i64, verb: i64) -> i64 {
     memory[1] = noun;

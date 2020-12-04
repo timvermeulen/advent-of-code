@@ -8,6 +8,7 @@ use std::{
 // TODO:
 // - easily print `Grid<bool>` using `#` and `.` without a custom type
 // - easily print a grid for a given range of coordinates
+#[derive(Clone)]
 pub struct Grid<T> {
     default: T,
     elements: HashMap<Pos, T>,

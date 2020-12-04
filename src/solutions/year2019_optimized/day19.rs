@@ -1,5 +1,5 @@
 use super::*;
-use intcode::prelude::*;
+use fast_intcode::*;
 
 #[derive(Copy, Clone)]
 struct Point {
@@ -45,7 +45,6 @@ fn boundary_points(is_pulled: impl Fn(Point) -> bool) -> (Point, Point, Point) {
 pub fn solve(input: &str) -> (usize, usize) {
     let memory = intcode::parser().parse_to_end(&input).unwrap();
     let is_pulled = |Point { x, y }| {
-        println!("testing {},{}", x, y);
         let mut computer = Computer::new(memory.clone());
         computer.step_with(x as i64);
         computer.step_with(y as i64).unwrap() == 1
@@ -138,16 +137,16 @@ async fn test() -> Result<(), InputError> {
     Ok(())
 }
 
-// #[cfg(test)]
-// mod benches {
-//     extern crate test;
+#[cfg(test)]
+mod benches {
+    extern crate test;
 
-//     use super::*;
-//     use test::Bencher;
+    use super::*;
+    use test::Bencher;
 
-//     #[bench]
-//     fn bench(b: &mut Bencher) {
-//         let input = futures::executor::block_on(get_input(2019, 19)).unwrap();
-//         b.iter(|| solve(&input));
-//     }
-// }
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2019, 19)).unwrap();
+        b.iter(|| solve(&input));
+    }
+}

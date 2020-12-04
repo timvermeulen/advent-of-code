@@ -116,7 +116,7 @@ const P2_NEIGHBORS: [Mask<u32>; 44] = [
     Mask(0b_0000_0000_1111000000000001),
 ];
 
-pub fn part1(input: &str) -> u32 {
+fn part1(input: &str) -> u32 {
     let mut mask = p1_parse(input);
     let mut seen = Vec::new();
 
@@ -157,7 +157,7 @@ fn p1_evolve(mask: Mask<u32>) -> Mask<u32> {
     one & !((!mask | two) & (mask | three))
 }
 
-pub fn part2(input: &str) -> u32 {
+fn part2(input: &str) -> u32 {
     let mask = p2_parse(input);
     let mut layers = [Mask::<u64>::empty(); 201];
     layers[100] = mask;
@@ -206,6 +206,10 @@ fn p2_evolve(mask: Mask<u64>) -> Mask<u64> {
     let three = Mask::<u64>::from(three);
 
     one & !((!mask | two) & (mask | three))
+}
+
+pub fn solve(input: &str) -> (u32, u32) {
+    (part1(input), part2(input))
 }
 
 #[async_std::test]
