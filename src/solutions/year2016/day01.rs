@@ -30,7 +30,10 @@ struct Instruction {
 }
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Instruction>> {
-    let side = choice((token('L').map(|_| Side::Left), token('R').map(|_| Side::Right)));
+    let side = choice((
+        token('L').map(|_| Side::Left),
+        token('R').map(|_| Side::Right),
+    ));
 
     let instruction =
         chain((side, parser::i32())).map(|(side, amount)| Instruction { side, amount });

@@ -24,8 +24,14 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Instruction>> {
         string("toggle").attempt().map(|_| Action::Toggle),
     ));
 
-    let instruction = chain((action, token(' '), coordinates, string(" through "), coordinates))
-        .map(|(action, _, start, _, end)| Instruction { action, start, end });
+    let instruction = chain((
+        action,
+        token(' '),
+        coordinates,
+        string(" through "),
+        coordinates,
+    ))
+    .map(|(action, _, start, _, end)| Instruction { action, start, end });
 
     instruction.collect_sep_by(token('\n'))
 }
@@ -37,8 +43,16 @@ fn part1(instructions: &[Instruction]) -> usize {
     let mut grid = [[false; SIZE]; SIZE];
 
     for instruction in instructions {
-        for col in grid.iter_mut().take(instruction.end.0 + 1).skip(instruction.start.0) {
-            for light in col.iter_mut().take(instruction.end.1 + 1).skip(instruction.start.1) {
+        for col in grid
+            .iter_mut()
+            .take(instruction.end.0 + 1)
+            .skip(instruction.start.0)
+        {
+            for light in col
+                .iter_mut()
+                .take(instruction.end.1 + 1)
+                .skip(instruction.start.1)
+            {
                 match instruction.action {
                     Action::TurnOn => *light = true,
                     Action::TurnOff => *light = false,
@@ -48,15 +62,27 @@ fn part1(instructions: &[Instruction]) -> usize {
         }
     }
 
-    grid.iter().flat_map(|x| x.iter()).copied().filter(|&l| l).count()
+    grid.iter()
+        .flat_map(|x| x.iter())
+        .copied()
+        .filter(|&l| l)
+        .count()
 }
 
 fn part2(instructions: &[Instruction]) -> usize {
     let mut grid = box [[0_usize; SIZE]; SIZE];
 
     for instruction in instructions {
-        for col in grid.iter_mut().take(instruction.end.0 + 1).skip(instruction.start.0) {
-            for light in col.iter_mut().take(instruction.end.1 + 1).skip(instruction.start.1) {
+        for col in grid
+            .iter_mut()
+            .take(instruction.end.0 + 1)
+            .skip(instruction.start.0)
+        {
+            for light in col
+                .iter_mut()
+                .take(instruction.end.1 + 1)
+                .skip(instruction.start.1)
+            {
                 match instruction.action {
                     Action::TurnOn => *light += 1,
                     Action::TurnOff => {

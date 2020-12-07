@@ -38,7 +38,12 @@ where
 
 impl Computer {
     pub fn new(memory: Vec<i64>) -> Self {
-        Self { memory, pc: 0, base: 0, state: State::Idle }
+        Self {
+            memory,
+            pc: 0,
+            base: 0,
+            state: State::Idle,
+        }
     }
 
     pub fn needs_input(&self) -> bool {
@@ -67,7 +72,10 @@ impl Computer {
     where
         I: IntoIterator<Item = i64>,
     {
-        Iter { inputs: inputs.into_iter(), comp: self }
+        Iter {
+            inputs: inputs.into_iter(),
+            comp: self,
+        }
     }
 
     pub fn step(&mut self) -> Interrupt {
@@ -100,7 +108,10 @@ impl Computer {
             let instruction = self.memory[self.pc as usize];
             self.pc += 1;
             let opcode = Opcode::new(instruction % 100);
-            let mut params = Params { comp: self, modes: instruction / 100 };
+            let mut params = Params {
+                comp: self,
+                modes: instruction / 100,
+            };
 
             match opcode {
                 Opcode::Add => {
@@ -177,7 +188,8 @@ impl Computer {
         } as usize;
 
         if address as usize >= self.memory.len() {
-            self.memory.extend(std::iter::repeat(0).take(address as usize - self.memory.len() + 1));
+            self.memory
+                .extend(std::iter::repeat(0).take(address as usize - self.memory.len() + 1));
         }
 
         self.memory[address as usize] = value;

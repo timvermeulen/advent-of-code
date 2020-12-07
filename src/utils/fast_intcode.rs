@@ -29,7 +29,12 @@ where
 
 impl Computer {
     pub fn new(memory: Vec<i64>) -> Self {
-        Self { memory, pc: 0, base: 0, state: State::Idle }
+        Self {
+            memory,
+            pc: 0,
+            base: 0,
+            state: State::Idle,
+        }
     }
 
     pub fn run(&mut self) -> Iter<'_, iter::Empty<i64>> {
@@ -44,7 +49,10 @@ impl Computer {
     where
         I: IntoIterator<Item = i64>,
     {
-        Iter { inputs: inputs.into_iter(), comp: self }
+        Iter {
+            inputs: inputs.into_iter(),
+            comp: self,
+        }
     }
 
     pub fn step(&mut self) -> Interrupt {
@@ -337,62 +345,110 @@ impl Computer {
             000_05 => {
                 let x = read_pos!(1);
                 let address = read_pos!(2);
-                self.pc = if x != 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x != 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             001_05 => {
                 let x = read_imm!(1);
                 let address = read_pos!(2);
-                self.pc = if x != 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x != 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             010_05 => {
                 let x = read_pos!(1);
                 let address = read_imm!(2);
-                self.pc = if x != 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x != 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             011_05 => {
                 let x = read_imm!(1);
                 let address = read_imm!(2);
-                self.pc = if x != 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x != 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             012_05 => {
                 let x = read_rel!(1);
                 let address = read_imm!(2);
-                self.pc = if x != 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x != 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             021_05 => {
                 let x = read_imm!(1);
                 let address = read_rel!(2);
-                self.pc = if x != 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x != 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             000_06 => {
                 let x = read_pos!(1);
                 let address = read_pos!(2);
-                self.pc = if x == 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x == 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             001_06 => {
                 let x = read_imm!(1);
                 let address = read_pos!(2);
-                self.pc = if x == 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x == 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             010_06 => {
                 let x = read_pos!(1);
                 let address = read_imm!(2);
-                self.pc = if x == 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x == 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             011_06 => {
                 let x = read_imm!(1);
                 let address = read_imm!(2);
-                self.pc = if x == 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x == 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             012_06 => {
                 let x = read_rel!(1);
                 let address = read_imm!(2);
-                self.pc = if x == 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x == 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             021_06 => {
                 let x = read_imm!(1);
                 let address = read_rel!(2);
-                self.pc = if x == 0 { address as usize } else { self.pc + 3 };
+                self.pc = if x == 0 {
+                    address as usize
+                } else {
+                    self.pc + 3
+                };
             }
             000_07 => {
                 let x = read_pos!(1);
@@ -597,7 +653,10 @@ impl Computer {
     }
 
     pub fn write_input(&mut self, input: i64) {
-        debug_assert!(matches!(self.state, State::WaitingForInput { .. }), "not waiting for input");
+        debug_assert!(
+            matches!(self.state, State::WaitingForInput { .. }),
+            "not waiting for input"
+        );
         let address = match self.state {
             State::WaitingForInput { address } => address,
             _ => unsafe { unreachable_unchecked() },
@@ -653,7 +712,8 @@ impl Computer {
 
     #[inline(never)]
     fn extend(&mut self, address: usize) {
-        self.memory.extend(iter::repeat(0).take(address - self.memory.len() + 1));
+        self.memory
+            .extend(iter::repeat(0).take(address - self.memory.len() + 1));
     }
 }
 
@@ -681,7 +741,10 @@ impl Interrupt {
 
     pub fn unwrap(self) -> i64 {
         debug_assert!(!matches!(self, Self::Halt), "no output, VM is halted");
-        debug_assert!(!matches!(self, Self::WaitingForInput), "no output, VM is waiting for input");
+        debug_assert!(
+            !matches!(self, Self::WaitingForInput),
+            "no output, VM is waiting for input"
+        );
         match self {
             Self::Output(output) => output,
             _ => unsafe { unreachable_unchecked() },

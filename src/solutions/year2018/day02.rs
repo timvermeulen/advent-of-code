@@ -1,7 +1,10 @@
 use super::*;
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<&'a str>> {
-    satisfy(char::is_alphabetic).skip_many1().recognize().collect_sep_by(token('\n'))
+    satisfy(char::is_alphabetic)
+        .skip_many1()
+        .recognize()
+        .collect_sep_by(token('\n'))
 }
 
 fn part1(ids: &[&str]) -> u32 {
@@ -20,15 +23,21 @@ fn part1(ids: &[&str]) -> u32 {
 }
 
 fn part2(ids: &[&str]) -> String {
-    let mut pairs =
-        ids.iter().enumerate().flat_map(|(i, &a)| ids[i + 1..].iter().map(move |&b| (a, b)));
+    let mut pairs = ids
+        .iter()
+        .enumerate()
+        .flat_map(|(i, &a)| ids[i + 1..].iter().map(move |&b| (a, b)));
     let (a, b) = pairs
         .find(|(a, b)| {
             let chars = || a.chars().zip(b.chars());
             chars().filter(|(a, b)| a != b).count() == 1
         })
         .unwrap();
-    a.chars().zip(b.chars()).filter(|(a, b)| a == b).map(|(a, _)| a).collect()
+    a.chars()
+        .zip(b.chars())
+        .filter(|(a, b)| a == b)
+        .map(|(a, _)| a)
+        .collect()
 }
 
 pub fn solve(input: &str) -> (u32, String) {

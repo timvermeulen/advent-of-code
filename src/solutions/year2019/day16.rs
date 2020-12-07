@@ -5,13 +5,23 @@ fn parse(input: &str) -> Vec<u32> {
 }
 
 fn part1(digits: &[u32]) -> u32 {
-    let pattern =
-        |i| [0, 1, 0, -1].iter().flat_map(move |&x| iter::repeat(x).take(i + 1)).cycle().skip(1);
+    let pattern = |i| {
+        [0, 1, 0, -1]
+            .iter()
+            .flat_map(move |&x| iter::repeat(x).take(i + 1))
+            .cycle()
+            .skip(1)
+    };
     let mut vec = digits.to_owned();
     for _ in 0..100 {
         vec = (0..vec.len())
             .map(|i| {
-                pattern(i).zip(&vec).map(|(a, &b)| a * b as i32).sum::<i32>().abs() as u32 % 10
+                pattern(i)
+                    .zip(&vec)
+                    .map(|(a, &b)| a * b as i32)
+                    .sum::<i32>()
+                    .abs() as u32
+                    % 10
             })
             .collect();
     }
@@ -22,7 +32,13 @@ fn part2(digits: &[u32]) -> u32 {
     let offset = digits[..7].iter().fold(0, |n, &d| 10 * n + d) as usize;
     let suffix_len = digits.len() * 10_000 - offset;
 
-    let mut suffix: Vec<_> = digits.iter().copied().rev().cycle().take(suffix_len).collect();
+    let mut suffix: Vec<_> = digits
+        .iter()
+        .copied()
+        .rev()
+        .cycle()
+        .take(suffix_len)
+        .collect();
 
     for _ in 0..100 {
         let mut prev = suffix[0];

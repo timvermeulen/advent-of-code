@@ -77,19 +77,38 @@ fn parse(mut input: &str) -> Vec<Operation> {
     let letter = parser::any().map(|c| c as u8);
     let steps = string(" step").followed_by(token('s').optional());
 
-    let swap_pos = chain((string("swap position "), position, string(" with position "), position))
-        .map(|(_, x, _, y)| Operation::SwapPositions { x, y });
-    let swap_letters = chain((string("swap letter "), letter, string(" with letter "), letter))
-        .map(|(_, x, _, y)| Operation::SwapLetters { x, y });
+    let swap_pos = chain((
+        string("swap position "),
+        position,
+        string(" with position "),
+        position,
+    ))
+    .map(|(_, x, _, y)| Operation::SwapPositions { x, y });
+    let swap_letters = chain((
+        string("swap letter "),
+        letter,
+        string(" with letter "),
+        letter,
+    ))
+    .map(|(_, x, _, y)| Operation::SwapLetters { x, y });
     let rotate_left = chain((string("rotate left "), parser::usize(), steps))
         .map(|(_, by, _)| Operation::RotateLeft { by });
     let rotate_right = chain((string("rotate right "), parser::usize(), steps))
         .map(|(_, by, _)| Operation::RotateRight { by });
-    let move_letter =
-        chain((string("move position "), position, string(" to position "), position))
-            .map(|(_, from, _, to)| Operation::Move { from, to });
-    let reverse = chain((string("reverse positions "), position, string(" through "), position))
-        .map(|(_, from, _, through)| Operation::Reverse { from, through });
+    let move_letter = chain((
+        string("move position "),
+        position,
+        string(" to position "),
+        position,
+    ))
+    .map(|(_, from, _, to)| Operation::Move { from, to });
+    let reverse = chain((
+        string("reverse positions "),
+        position,
+        string(" through "),
+        position,
+    ))
+    .map(|(_, from, _, through)| Operation::Reverse { from, through });
     let rotate = chain((string("rotate based on position of letter "), letter))
         .map(|(_, based_on)| Operation::Rotate { based_on });
 
@@ -101,7 +120,10 @@ fn parse(mut input: &str) -> Vec<Operation> {
         .or(move_letter.attempt())
         .or(reverse.attempt())
         .or(rotate.attempt());
-    operation.collect_sep_by(token('\n')).parse_to_end(&mut input).unwrap()
+    operation
+        .collect_sep_by(token('\n'))
+        .parse_to_end(&mut input)
+        .unwrap()
 }
 
 fn part1(operations: &[Operation]) -> [u8; 8] {

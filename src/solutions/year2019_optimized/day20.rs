@@ -66,7 +66,10 @@ fn data(input: &str) -> Data {
         |Pos { x, y }| x == 2 || x == width as i32 - 3 || y == 2 || y == height as i32 - 3;
 
     let mut add_portal = |x: usize, y: usize, dir: Dir| {
-        let pos = Pos { x: x as i32, y: y as i32 };
+        let pos = Pos {
+            x: x as i32,
+            y: y as i32,
+        };
 
         if !is_path(pos) {
             return;
@@ -92,7 +95,10 @@ fn data(input: &str) -> Data {
         portals.push((id, pos, dir.opposite()));
     };
 
-    let thickness = (2..).find(|&i| byte_at(Pos { x: i, y: i }) == b' ').unwrap() as usize - 2;
+    let thickness = (2..)
+        .find(|&i| byte_at(Pos { x: i, y: i }) == b' ')
+        .unwrap() as usize
+        - 2;
 
     let is_in_corner = |Pos { x, y }| {
         let w = width as i32;
@@ -279,7 +285,13 @@ fn data(input: &str) -> Data {
         }
     }
 
-    Data { start, end, distances, portals: portal_info, min_dist }
+    Data {
+        start,
+        end,
+        distances,
+        portals: portal_info,
+        min_dist,
+    }
 }
 
 fn part1(data: &Data) -> u32 {
@@ -315,7 +327,10 @@ fn part2(data: &Data) -> u32 {
                 let new_depth = depth + delta;
                 let is_blocked = delta == 0 && depth > 0;
                 if !is_blocked && dist > 0 && new_depth >= 0 {
-                    Some(((data.sibling_portal_of(j), new_depth), dist + data.cost_of(j)))
+                    Some((
+                        (data.sibling_portal_of(j), new_depth),
+                        dist + data.cost_of(j),
+                    ))
                 } else {
                     None
                 }

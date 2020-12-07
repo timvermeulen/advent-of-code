@@ -27,7 +27,10 @@ impl Data {
     }
 
     fn quadrant_of(&self, key: u32) -> usize {
-        self.quadrants.iter().position(|mask| mask.contains(key)).unwrap()
+        self.quadrants
+            .iter()
+            .position(|mask| mask.contains(key))
+            .unwrap()
     }
 
     fn doors_blocking_key(&self, key: u32) -> Mask<u32> {
@@ -77,7 +80,10 @@ fn data(input: &str) -> Data {
     let mut quadrants = [Mask::empty(); 4];
 
     for (i, &(dx, dy)) in [(-1, -1), (-1, 1), (1, -1), (1, 1)].iter().enumerate() {
-        let entrance = Pos { x: entrance.x + dx, y: entrance.y + dy };
+        let entrance = Pos {
+            x: entrance.x + dx,
+            y: entrance.y + dy,
+        };
         let mut stack = vec![(entrance, 0, Mask::empty())];
         let mut seen = HashSet::new();
         let mut branches = Vec::<(u32, i32, i32)>::new(); // (key, distance to entrance, distance to branch)
@@ -138,7 +144,13 @@ fn data(input: &str) -> Data {
         }
     }
 
-    Data { all_keys, blocked_by, distance, distance_to_entrance, quadrants }
+    Data {
+        all_keys,
+        blocked_by,
+        distance,
+        distance_to_entrance,
+        quadrants,
+    }
 }
 
 fn part1(data: &Data) -> i32 {
@@ -150,7 +162,13 @@ fn part1(data: &Data) -> i32 {
 
     let mut map = HashMap::new();
     let mut new = HashMap::new();
-    map.insert(Node { location: Location::Entrance, not_collected: data.all_keys }, 2);
+    map.insert(
+        Node {
+            location: Location::Entrance,
+            not_collected: data.all_keys,
+        },
+        2,
+    );
 
     for _ in 0..26 {
         for (node, cost) in map.drain() {
@@ -163,7 +181,9 @@ fn part1(data: &Data) -> i32 {
                 let cost = cost + data.distance_between(node.location, key);
                 node.location = Location::Key(key);
                 node.not_collected.remove(key);
-                new.entry(node).and_modify(|c| *c = cmp::min(*c, cost)).or_insert(cost);
+                new.entry(node)
+                    .and_modify(|c| *c = cmp::min(*c, cost))
+                    .or_insert(cost);
             }
         }
         mem::swap(&mut map, &mut new);
@@ -181,7 +201,13 @@ fn part2(data: &Data) -> i32 {
 
     let mut map = HashMap::new();
     let mut new = HashMap::new();
-    map.insert(Node { locations: [Location::Entrance; 4], not_collected: data.all_keys }, 0);
+    map.insert(
+        Node {
+            locations: [Location::Entrance; 4],
+            not_collected: data.all_keys,
+        },
+        0,
+    );
 
     for _ in 0..26 {
         for (node, cost) in map.drain() {
@@ -195,7 +221,9 @@ fn part2(data: &Data) -> i32 {
                 let cost = cost + data.distance_between(node.locations[quadrant], key);
                 node.locations[quadrant] = Location::Key(key);
                 node.not_collected.remove(key);
-                new.entry(node).and_modify(|c| *c = cmp::min(*c, cost)).or_insert(cost);
+                new.entry(node)
+                    .and_modify(|c| *c = cmp::min(*c, cost))
+                    .or_insert(cost);
             }
         }
         mem::swap(&mut map, &mut new);

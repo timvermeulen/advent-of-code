@@ -48,11 +48,16 @@ fn json<'a>() -> impl Parser<&'a str, Output = JSON<'a>> {
 }
 
 fn string<'a>() -> impl Parser<&'a str, Output = &'a str> {
-    satisfy(char::is_alphabetic).skip_many1().recognize().between(token('\"'), token('\"'))
+    satisfy(char::is_alphabetic)
+        .skip_many1()
+        .recognize()
+        .between(token('\"'), token('\"'))
 }
 
 fn array<'a>() -> impl Parser<&'a str, Output = Vec<JSON<'a>>> {
-    json().collect_sep_by(token(',')).between(token('['), token(']'))
+    json()
+        .collect_sep_by(token(','))
+        .between(token('['), token(']'))
 }
 
 fn object<'a>() -> impl Parser<&'a str, Output = Vec<(&'a str, JSON<'a>)>> {

@@ -63,7 +63,10 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Vec<Token>>> {
     ));
 
     let escape = token('\\').followed_by(escaped).map(|(_, s)| s);
-    let tokens = escape.map(Token::Escape).or(word.map(Token::Letters)).collect_many();
+    let tokens = escape
+        .map(Token::Escape)
+        .or(word.map(Token::Letters))
+        .collect_many();
 
     let literal = tokens.between(token('\"'), token('\"'));
     let literals = literal.collect_sep_by(token('\n'));
@@ -71,11 +74,17 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Vec<Token>>> {
 }
 
 fn part1(tokens: &[Vec<Token>]) -> u32 {
-    tokens.iter().map(|tokens| tokens.iter().fold(2, |n, t| n + t.code() - t.memory())).sum()
+    tokens
+        .iter()
+        .map(|tokens| tokens.iter().fold(2, |n, t| n + t.code() - t.memory()))
+        .sum()
 }
 
 fn part2(tokens: &[Vec<Token>]) -> u32 {
-    tokens.iter().map(|tokens| tokens.iter().fold(4, |n, t| n + t.encoded() - t.code())).sum()
+    tokens
+        .iter()
+        .map(|tokens| tokens.iter().fold(4, |n, t| n + t.encoded() - t.code()))
+        .sum()
 }
 
 pub fn solve(input: &str) -> (u32, u32) {

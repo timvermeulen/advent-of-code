@@ -33,7 +33,11 @@ impl Reindeer {
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Reindeer>> {
     parser::u32()
         .sep_by(rubbish(), |iter| {
-            Some(Reindeer { speed: iter.next()?, fly: iter.next()?, rest: iter.next()? })
+            Some(Reindeer {
+                speed: iter.next()?,
+                fly: iter.next()?,
+                rest: iter.next()?,
+            })
         })
         .between(rubbish(), rubbish())
         .collect_sep_by(token('\n'))
@@ -45,8 +49,10 @@ fn part1(reindeer: &[Reindeer]) -> u32 {
 
 fn part2(reindeer: &[Reindeer]) -> u32 {
     let mut scores = vec![0; reindeer.len()];
-    let distances: Vec<Vec<u32>> =
-        reindeer.iter().map(|reindeer| reindeer.partial_distances().collect()).collect();
+    let distances: Vec<Vec<u32>> = reindeer
+        .iter()
+        .map(|reindeer| reindeer.partial_distances().collect())
+        .collect();
     for i in 0..TIME as usize {
         let distances = || distances.iter().map(|d| d[i]);
         let max = distances().max().unwrap();

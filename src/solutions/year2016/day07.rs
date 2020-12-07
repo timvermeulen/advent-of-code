@@ -52,7 +52,9 @@ fn supports_ssl(s: &str) -> bool {
 }
 
 fn is_abba(s: &str) -> bool {
-    s.as_bytes().windows(4).any(|w| w[0] == w[3] && w[1] == w[2] && w[0] != w[1])
+    s.as_bytes()
+        .windows(4)
+        .any(|w| w[0] == w[3] && w[1] == w[2] && w[0] != w[1])
 }
 
 #[cfg(test)]

@@ -1,4 +1,5 @@
-const SESSION_TOKEN: &str = env!("AOC_TOKEN");
+// const SESSION_TOKEN: &str = env!("AOC_TOKEN");
+const SESSION_TOKEN: &str = "53616c7465645f5f38d5352b28e104dc28f094f23bca3b7b860f9ae01fa77336df4460c43250fbfc31b0ed3071dc6d26";
 
 type SurfError = Box<dyn std::error::Error + Send + Sync>;
 type SurfResult<T> = Result<T, SurfError>;
@@ -26,7 +27,9 @@ pub async fn get_input(year: u32, day: u32) -> Result<String, InputError> {
         Ok(input) => Ok(input),
         Err(_) => {
             let mut input = download_input(year, day).await?;
-            input.truncate(input.len() - 1); // remove the trailing newline
+            if input.chars().last() == Some('\n') {
+                input.truncate(input.len() - 1); // remove the trailing newline
+            }
             write_input(year, path, &input).await?;
             Ok(input)
         }
@@ -34,10 +37,13 @@ pub async fn get_input(year: u32, day: u32) -> Result<String, InputError> {
 }
 
 async fn download_input(year: u32, day: u32) -> SurfResult<String> {
-    surf::get(format!("https://adventofcode.com/{}/day/{}/input", year, day))
-        .set_header("cookie", format!("session={}", SESSION_TOKEN))
-        .recv_string()
-        .await
+    surf::get(format!(
+        "https://adventofcode.com/{}/day/{}/input",
+        year, day
+    ))
+    .set_header("cookie", format!("session={}", SESSION_TOKEN))
+    .recv_string()
+    .await
 }
 
 async fn read_input(path: &str) -> async_std::io::Result<String> {

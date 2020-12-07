@@ -17,7 +17,9 @@ fn dir_string(dir: Dir) -> &'static str {
 
 impl Droid {
     fn new(memory: Vec<i64>) -> Self {
-        Self { comp: Computer::new(memory) }
+        Self {
+            comp: Computer::new(memory),
+        }
     }
 
     fn log_and_move_to(&mut self, dir: Dir) -> String {
@@ -69,8 +71,13 @@ pub fn solve(input: &str) -> u32 {
     let mut moves_to_checkpoint = None;
     let mut items = Vec::new();
 
-    let forbidden =
-        ["infinite loop", "photons", "molten lava", "escape pod", "giant electromagnet"];
+    let forbidden = [
+        "infinite loop",
+        "photons",
+        "molten lava",
+        "escape pod",
+        "giant electromagnet",
+    ];
 
     while let Some((dir, dist)) = stack.pop() {
         // backtracking

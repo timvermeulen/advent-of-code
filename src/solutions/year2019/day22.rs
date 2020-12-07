@@ -32,7 +32,9 @@ impl Technique {
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Technique>> {
     let deal = string("deal into new stack").map(|_| Technique::Deal);
-    let cut = string("cut ").followed_by(parser::i128()).map(|(_, n)| Technique::Cut(n));
+    let cut = string("cut ")
+        .followed_by(parser::i128())
+        .map(|(_, n)| Technique::Cut(n));
     let increment = string("deal with increment ")
         .followed_by(parser::i128())
         .map(|(_, n)| Technique::Increment(n));
@@ -40,15 +42,21 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Technique>> {
 }
 
 fn part1(techniques: &[Technique]) -> i128 {
-    techniques.iter().fold(2019, |index, t| t.apply(index, 10_007))
+    techniques
+        .iter()
+        .fold(2019, |index, t| t.apply(index, 10_007))
 }
 
 fn part2(techniques: &[Technique]) -> i128 {
     const NUM_CARDS: i128 = 119_315_717_514_047;
     const NUM_SHUFFLES: i128 = 101_741_582_076_661;
 
-    let apply =
-        |index| techniques.iter().rev().fold(index, |index, t| t.apply_reversed(index, NUM_CARDS));
+    let apply = |index| {
+        techniques
+            .iter()
+            .rev()
+            .fold(index, |index, t| t.apply_reversed(index, NUM_CARDS))
+    };
 
     let x: i128 = 2020;
     let y = apply(x);

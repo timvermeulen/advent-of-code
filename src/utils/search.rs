@@ -16,7 +16,10 @@ pub trait Dijkstra {
     fn run(&self) -> Option<Self::Cost> {
         let mut heap = BinaryHeap::new();
         let mut seen = HashSet::new();
-        heap.push(Wrapper { node: self.start(), cost: Self::Cost::zero() });
+        heap.push(Wrapper {
+            node: self.start(),
+            cost: Self::Cost::zero(),
+        });
         // let mut count = 0;
         // let mut max_len = 0;
 
@@ -30,7 +33,12 @@ pub trait Dijkstra {
                 // dbg!(max_len);
                 return Some(cost);
             }
-            self.neighbors(&node, |node, c| heap.push(Wrapper { node, cost: cost + c }));
+            self.neighbors(&node, |node, c| {
+                heap.push(Wrapper {
+                    node,
+                    cost: cost + c,
+                })
+            });
             // max_len = std::cmp::max(max_len, heap.len());
         }
         None

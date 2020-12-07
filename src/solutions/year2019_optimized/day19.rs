@@ -21,7 +21,11 @@ impl PartialOrd for Point {
 
 fn boundary_points(is_pulled: impl Fn(Point) -> bool) -> (Point, Point, Point) {
     if is_pulled(Point { x: 1, y: 1 }) {
-        return (Point { x: 1, y: 0 }, Point { x: 1, y: 1 }, Point { x: 0, y: 1 });
+        return (
+            Point { x: 1, y: 0 },
+            Point { x: 1, y: 1 },
+            Point { x: 0, y: 1 },
+        );
     }
 
     for max in 1.. {

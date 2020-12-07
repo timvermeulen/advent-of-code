@@ -5,7 +5,14 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Range<u32>> {
 }
 
 fn digits(n: u32) -> [u32; 6] {
-    [n / 100_000, n / 10_000 % 10, n / 1000 % 10, n / 100 % 10, n / 10 % 10, n % 10]
+    [
+        n / 100_000,
+        n / 10_000 % 10,
+        n / 1000 % 10,
+        n / 100 % 10,
+        n / 10 % 10,
+        n % 10,
+    ]
 }
 
 fn part1(range: Range<u32>) -> usize {

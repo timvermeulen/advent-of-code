@@ -47,11 +47,17 @@ impl Moon {
 fn parser<'a>() -> impl Parser<&'a str, Output = [Moon; 4]> {
     let moon = parser::i32()
         .sep_by(rubbish(), |iter| {
-            let axes = [Axis::new(iter.next()?), Axis::new(iter.next()?), Axis::new(iter.next()?)];
+            let axes = [
+                Axis::new(iter.next()?),
+                Axis::new(iter.next()?),
+                Axis::new(iter.next()?),
+            ];
             Some(Moon { axes })
         })
         .between(rubbish(), rubbish());
-    moon.sep_by(newline(), |iter| Some([iter.next()?, iter.next()?, iter.next()?, iter.next()?]))
+    moon.sep_by(newline(), |iter| {
+        Some([iter.next()?, iter.next()?, iter.next()?, iter.next()?])
+    })
 }
 
 fn part1(mut moons: [Moon; 4]) -> i32 {

@@ -40,7 +40,10 @@ impl Cube {
     fn new(origin: Point, exponent: u32) -> Cube {
         let side_length = 1 << exponent;
 
-        Cube { origin, side_length }
+        Cube {
+            origin,
+            side_length,
+        }
     }
 
     /// Splits the cube into smaller cubes each with half the side
@@ -146,13 +149,20 @@ impl PartialOrd for OrdCube {
 impl OrdCube {
     fn new(cube: Cube, bots: &[NanoBot]) -> OrdCube {
         let bots_in_range = bots.iter().filter(|b| b.reaches_cube(cube)).count();
-        OrdCube { cube, bots_in_range }
+        OrdCube {
+            cube,
+            bots_in_range,
+        }
     }
 
     /// Splits the cube into smaller cubes each with half the side
     /// length of the original cube.
     fn split(&self, bots: &[NanoBot]) -> Vec<Self> {
-        self.cube.split().iter().map(|&c| OrdCube::new(c, bots)).collect()
+        self.cube
+            .split()
+            .iter()
+            .map(|&c| OrdCube::new(c, bots))
+            .collect()
     }
 
     /// Returns the origin if that's the only point inside the cube,
@@ -165,7 +175,11 @@ impl OrdCube {
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<NanoBot>> {
     let position = parser::i32()
         .sep_by(token(','), |iter| {
-            Some(Point { x: iter.next()?, y: iter.next()?, z: iter.next()? })
+            Some(Point {
+                x: iter.next()?,
+                y: iter.next()?,
+                z: iter.next()?,
+            })
         })
         .between(token('<'), token('>'));
     let bot = chain((string("pos="), position, string(", r="), parser::i32()))
@@ -175,7 +189,9 @@ fn parser<'a>() -> impl Parser<&'a str, Output = Vec<NanoBot>> {
 
 fn part1(bots: &[NanoBot]) -> u32 {
     let bot = bots.iter().max_by_key(|bot| bot.radius).unwrap();
-    bots.iter().filter(|b| bot.reaches_point(b.position)).count() as u32
+    bots.iter()
+        .filter(|b| bot.reaches_point(b.position))
+        .count() as u32
 }
 
 fn part2(bots: &[NanoBot]) -> i32 {
@@ -192,7 +208,11 @@ fn part2(bots: &[NanoBot]) -> i32 {
 
     let size = cmp::max(cmp::max(max_x - min_x, max_y - min_y), max_z - min_z);
     let exponent = 8 * mem::size_of::<i32>() as u32 - size.leading_zeros();
-    let origin = Point { x: min_x, y: min_y, z: min_z };
+    let origin = Point {
+        x: min_x,
+        y: min_y,
+        z: min_z,
+    };
 
     let cube = OrdCube::new(Cube::new(origin, exponent), &bots);
     let mut heap = BinaryHeap::new();

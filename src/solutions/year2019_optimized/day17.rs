@@ -144,7 +144,10 @@ pub fn solve(input: &str) -> (i32, i64) {
     input.push_str("n\n");
 
     robot.memory[0] = 2;
-    let part2 = robot.run_with_iter(input.bytes().map(|b| b as i64)).last().unwrap();
+    let part2 = robot
+        .run_with_iter(input.bytes().map(|b| b as i64))
+        .last()
+        .unwrap();
 
     (part1, part2)
 }

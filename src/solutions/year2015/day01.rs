@@ -6,7 +6,11 @@ enum Direction {
 }
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Direction>> {
-    choice((token('(').map(|_| Direction::Up), token(')').map(|_| Direction::Down))).collect_many()
+    choice((
+        token('(').map(|_| Direction::Up),
+        token(')').map(|_| Direction::Down),
+    ))
+    .collect_many()
 }
 
 fn part1(directions: &[Direction]) -> i32 {

@@ -3,9 +3,8 @@
     array_value_iter,
     try_blocks,
     box_syntax,
-    slice_patterns,
     core_intrinsics,
-    matches_macro
+    partition_point
 )]
 
 mod input;

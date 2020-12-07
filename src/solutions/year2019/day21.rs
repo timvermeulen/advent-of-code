@@ -21,7 +21,10 @@ RUN
 
 fn run(memory: Vec<i64>, input: &str) -> i64 {
     let mut droid = Computer::new(memory);
-    droid.run_with_iter(input.bytes().map(|b| b as i64)).last().unwrap()
+    droid
+        .run_with_iter(input.bytes().map(|b| b as i64))
+        .last()
+        .unwrap()
 }
 
 fn part1(memory: Vec<i64>) -> i64 {

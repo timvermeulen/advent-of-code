@@ -1,5 +1,12 @@
 #![allow(unused)]
-#![feature(test, array_value_iter, try_blocks, box_syntax, core_intrinsics, matches_macro)]
+#![feature(
+    test,
+    array_value_iter,
+    try_blocks,
+    box_syntax,
+    core_intrinsics,
+    partition_point
+)]
 
 mod input;
 mod solutions;

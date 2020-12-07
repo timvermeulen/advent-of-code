@@ -30,7 +30,10 @@ struct MinutesAsleep {
 
 impl Default for MinutesAsleep {
     fn default() -> Self {
-        Self { total: 0, per_minute: [0; 60] }
+        Self {
+            total: 0,
+            per_minute: [0; 60],
+        }
     }
 }
 
@@ -43,12 +46,21 @@ impl MinutesAsleep {
     }
 
     fn most_common_minute(self) -> (u32, u32) {
-        (0..60).map(|m| (m, self.per_minute[m as usize])).max_by_key(|&(_, x)| x).unwrap()
+        (0..60)
+            .map(|m| (m, self.per_minute[m as usize]))
+            .max_by_key(|&(_, x)| x)
+            .unwrap()
     }
 }
 
 fn parse(input: &str) -> Vec<Record> {
-    let date = chain((parser::u32(), token('-'), parser::u32(), token('-'), parser::u32()));
+    let date = chain((
+        parser::u32(),
+        token('-'),
+        parser::u32(),
+        token('-'),
+        parser::u32(),
+    ));
     let time = chain((parser::u32(), token(':'), parser::u32()));
     let timestamp = chain((token('['), date, token(' '), time, token(']'))).map(
         |(_, (year, _, month, _, day), _, (hour, _, minute), _)| Timestamp {
@@ -67,8 +79,10 @@ fn parse(input: &str) -> Vec<Record> {
     let action = choice((begin.attempt(), asleep.attempt(), awake));
 
     let record = chain((timestamp, action)).map(|(timestamp, action)| Record { timestamp, action });
-    let mut records: Vec<_> =
-        record.collect_sep_by(token('\n')).parse_to_end(input).expect("parsing failed");
+    let mut records: Vec<_> = record
+        .collect_sep_by(token('\n'))
+        .parse_to_end(input)
+        .expect("parsing failed");
     records.sort_by_key(|r| r.timestamp);
     records
 }

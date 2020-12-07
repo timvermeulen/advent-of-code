@@ -26,7 +26,10 @@ fn ore_cost(fuel: i64, reactions: &HashMap<Chemical<'_>, Reaction<'_>>) -> i64 {
         }
     }
 
-    let mut ready = vec![Amount { amount: fuel, chemical: FUEL }];
+    let mut ready = vec![Amount {
+        amount: fuel,
+        chemical: FUEL,
+    }];
     let mut not_ready: HashMap<Chemical<'_>, _> = HashMap::new();
 
     while let Some(Amount { amount, chemical }) = ready.pop() {
@@ -42,7 +45,10 @@ fn ore_cost(fuel: i64, reactions: &HashMap<Chemical<'_>, Reaction<'_>>) -> i64 {
             let count = counts.get_mut(&input.chemical).unwrap();
             *count -= 1;
             if *count == 0 {
-                ready.push(Amount { amount, chemical: input.chemical });
+                ready.push(Amount {
+                    amount,
+                    chemical: input.chemical,
+                });
             } else {
                 not_ready.insert(input.chemical, amount);
             }
@@ -76,16 +82,28 @@ fn optimal_ore_cost(
 fn part2(reactions: &HashMap<Chemical<'_>, Reaction<'_>>) -> i64 {
     const TRILLION: i64 = 1_000_000_000_000;
     let upper_bound = (TRILLION as f64 / optimal_ore_cost(FUEL, reactions)).floor() as i64;
-    (0..=upper_bound).rev().find(|&n| ore_cost(n, reactions) <= TRILLION).unwrap()
+    (0..=upper_bound)
+        .rev()
+        .find(|&n| ore_cost(n, reactions) <= TRILLION)
+        .unwrap()
 }
 
 fn parser<'a>() -> impl Parser<&'a str, Output = HashMap<Chemical<'a>, Reaction<'a>>> {
-    let amount = chain((parser::i64(), token(' '), alphabetic().skip_many().recognize()))
-        .map(|(amount, _, chemical)| Amount { amount, chemical: Chemical(chemical) });
+    let amount = chain((
+        parser::i64(),
+        token(' '),
+        alphabetic().skip_many().recognize(),
+    ))
+    .map(|(amount, _, chemical)| Amount {
+        amount,
+        chemical: Chemical(chemical),
+    });
     let inputs = amount.collect_sep_by(string(", "));
     let reaction = chain((inputs, string(" => "), amount))
         .map(|(inputs, _, output)| Reaction { inputs, output });
-    reaction.map(|r: Reaction<'a>| (r.output.chemical, r)).collect_sep_by(newline())
+    reaction
+        .map(|r: Reaction<'a>| (r.output.chemical, r))
+        .collect_sep_by(newline())
 }
 
 pub fn solve(input: &str) -> (i64, i64) {

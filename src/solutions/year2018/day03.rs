@@ -24,9 +24,19 @@ fn parse(input: &str) -> Vec<Claim> {
     let id = chain((token('#'), parser::u32()));
     let origin = chain((parser::u32(), token(','), parser::u32()));
     let size = chain((parser::u32(), token('x'), parser::u32()));
-    let claim = chain((id, string(" @ "), origin, string(": "), size))
-        .map(|((_, id), _, (x, _, y), _, (width, _, height))| Claim { id, x, y, width, height });
-    claim.collect_sep_by(token('\n')).parse_to_end(&input).unwrap()
+    let claim = chain((id, string(" @ "), origin, string(": "), size)).map(
+        |((_, id), _, (x, _, y), _, (width, _, height))| Claim {
+            id,
+            x,
+            y,
+            width,
+            height,
+        },
+    );
+    claim
+        .collect_sep_by(token('\n'))
+        .parse_to_end(&input)
+        .unwrap()
 }
 
 fn part1(claims: &[Claim]) -> u32 {
@@ -47,7 +57,10 @@ fn part2(claims: &[Claim]) -> u32 {
         .iter()
         .enumerate()
         .find(|&(i, &first)| {
-            claims.iter().enumerate().all(|(j, &second)| i == j || !first.overlaps(second))
+            claims
+                .iter()
+                .enumerate()
+                .all(|(j, &second)| i == j || !first.overlaps(second))
         })
         .unwrap();
     claim.id

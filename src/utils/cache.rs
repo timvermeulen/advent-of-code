@@ -52,5 +52,8 @@ fn test_fib() {
 
     let mut fib_memo = Cache::new(fib);
 
-    assert_eq!(fib_memo.get(186), 332_825_110_087_067_562_321_196_029_789_634_457_848);
+    assert_eq!(
+        fib_memo.get(186),
+        332_825_110_087_067_562_321_196_029_789_634_457_848
+    );
 }

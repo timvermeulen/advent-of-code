@@ -4,7 +4,10 @@ fn part1(input: &str) -> usize {
 
 fn is_nice1(string: &str) -> bool {
     string.chars().filter(|&c| "aeiou".contains(c)).count() >= 3
-        && string.chars().zip(string.chars().skip(1)).any(|(a, b)| a == b)
+        && string
+            .chars()
+            .zip(string.chars().skip(1))
+            .any(|(a, b)| a == b)
         && !["ab", "cd", "pq", "xy"].iter().any(|&s| string.contains(s))
 }
 
@@ -18,12 +21,18 @@ fn is_nice2(string: &str) -> bool {
 
 fn rule1(string: &str) -> bool {
     let bytes = string.as_bytes();
-    (0..bytes.len() - 3)
-        .any(|i| bytes[i + 2..].windows(2).any(|s| s[0] == bytes[i] && s[1] == bytes[i + 1]))
+    (0..bytes.len() - 3).any(|i| {
+        bytes[i + 2..]
+            .windows(2)
+            .any(|s| s[0] == bytes[i] && s[1] == bytes[i + 1])
+    })
 }
 
 fn rule2(string: &str) -> bool {
-    string.chars().zip(string.chars().skip(2)).any(|(a, b)| a == b)
+    string
+        .chars()
+        .zip(string.chars().skip(2))
+        .any(|(a, b)| a == b)
 }
 
 pub fn solve(input: &str) -> (usize, usize) {

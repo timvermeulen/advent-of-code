@@ -18,11 +18,15 @@ fn find_hash(key: &str, lower_bound: usize, mut condition: impl FnMut([u8; 16]) 
 }
 
 fn part1(key: &str) -> usize {
-    find_hash(key, 1, |output| output[0] == 0 && output[1] == 0 && output[2] >> 4 == 0)
+    find_hash(key, 1, |output| {
+        output[0] == 0 && output[1] == 0 && output[2] >> 4 == 0
+    })
 }
 
 fn part2(key: &str, lower: usize) -> usize {
-    find_hash(key, lower, |output| output[0] == 0 && output[1] == 0 && output[2] == 0)
+    find_hash(key, lower, |output| {
+        output[0] == 0 && output[1] == 0 && output[2] == 0
+    })
 }
 
 pub fn solve(input: &str) -> (usize, usize) {

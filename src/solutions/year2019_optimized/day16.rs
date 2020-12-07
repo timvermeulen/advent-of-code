@@ -126,7 +126,10 @@ impl Transition {
             phase_affect.step(0);
         }
 
-        Self { base_affect, phase_affect }
+        Self {
+            base_affect,
+            phase_affect,
+        }
     }
 
     fn apply(&self, phases: Phases) -> Phases {

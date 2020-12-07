@@ -19,14 +19,22 @@ fn path<'a>(map: &'a HashMap<&'a str, &'a str>, planet: &'a str) -> impl Iterato
 }
 
 fn part1(orbits: &HashMap<&str, &str>) -> usize {
-    orbits.values().map(|planet| path(orbits, planet).count()).sum()
+    orbits
+        .values()
+        .map(|planet| path(orbits, planet).count())
+        .sum()
 }
 
 fn part2(orbits: &HashMap<&str, &str>) -> usize {
     let path = |start| path(orbits, start).skip(1).collect::<Vec<_>>();
     let a = path("YOU");
     let b = path("SAN");
-    let in_common = a.iter().rev().zip(b.iter().rev()).take_while(|(a, b)| a == b).count();
+    let in_common = a
+        .iter()
+        .rev()
+        .zip(b.iter().rev())
+        .take_while(|(a, b)| a == b)
+        .count();
     a.len() + b.len() - 2 * in_common
 }
 

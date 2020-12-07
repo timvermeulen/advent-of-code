@@ -52,3 +52,9 @@ pub fn bits(mut n: usize) -> impl Iterator<Item = bool> {
         }
     })
 }
+
+pub fn ascii_split(s: &str, byte: u8) -> impl Iterator<Item = &str> {
+    s.as_bytes()
+        .split(move |&b| b == byte)
+        .map(|s| unsafe { std::str::from_utf8_unchecked(s) })
+}

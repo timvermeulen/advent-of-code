@@ -114,8 +114,13 @@ fn part2(depth: i32, target: Pos) -> i32 {
 
 fn parser<'a>() -> impl Parser<&'a str, Output = (i32, Pos)> {
     let target = chain((parser::i32(), token(','), parser::i32())).map(|(x, _, y)| Pos { x, y });
-    chain((string("depth: "), parser::i32(), string("\ntarget: "), target))
-        .map(|(_, depth, _, target)| (depth, target))
+    chain((
+        string("depth: "),
+        parser::i32(),
+        string("\ntarget: "),
+        target,
+    ))
+    .map(|(_, depth, _, target)| (depth, target))
 }
 
 pub fn solve(input: &str) -> (i32, i32) {

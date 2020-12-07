@@ -41,11 +41,12 @@ pub fn solve(input: &str) -> (i64, i64) {
     let mut heap = Heap::new(&mut part2);
     while let Some(p) = heap.next_permutation() {
         let result = (0..10).fold(0, |signal, i| {
-            p.iter().fold(signal, |signal, x| match unsafe { *x.get_unchecked(i) } {
-                1 => signal + 1,
-                2 => signal + 2,
-                _ => signal * 2,
-            })
+            p.iter()
+                .fold(signal, |signal, x| match unsafe { *x.get_unchecked(i) } {
+                    1 => signal + 1,
+                    2 => signal + 2,
+                    _ => signal * 2,
+                })
         });
         part2_max = cmp::max(part2_max, result);
     }

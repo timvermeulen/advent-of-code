@@ -25,7 +25,9 @@ pub fn solve(input: &str) -> (usize, usize) {
         orbit_counts[i_p] += 1;
     }
 
-    let mut objects: Vec<_> = (1..num_objects + 1).filter(|&i| orbit_counts[i] == 0).collect();
+    let mut objects: Vec<_> = (1..num_objects + 1)
+        .filter(|&i| orbit_counts[i] == 0)
+        .collect();
     let mut part1 = 0;
     let mut path_counts = vec![0; num_objects + 1];
     while let Some(object) = objects.pop() {

@@ -7,7 +7,9 @@ struct Drone {
 
 impl Drone {
     fn new(memory: Vec<i64>) -> Self {
-        Self { comp: Computer::new(memory) }
+        Self {
+            comp: Computer::new(memory),
+        }
     }
 
     fn move_to(&mut self, dir: Dir) -> i64 {

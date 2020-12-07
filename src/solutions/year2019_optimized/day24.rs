@@ -173,12 +173,16 @@ fn part2(input: &str) -> u32 {
         }
     }
 
-    layers.iter().map(|&m| (m.0 & ((1 << 24) - 1)).count_ones()).sum()
+    layers
+        .iter()
+        .map(|&m| (m.0 & ((1 << 24) - 1)).count_ones())
+        .sum()
 }
 
 fn p2_parse(input: &str) -> Mask<u64> {
-    let byte_indices =
-        [0, 1, 2, 3, 4, 10, 16, 22, 28, 27, 26, 25, 24, 18, 12, 6, 8, 15, 20, 13, 7, 9, 21, 19];
+    let byte_indices = [
+        0, 1, 2, 3, 4, 10, 16, 22, 28, 27, 26, 25, 24, 18, 12, 6, 8, 15, 20, 13, 7, 9, 21, 19,
+    ];
 
     let mut mask = Mask::empty();
     for (i, &byte_index) in (0..).zip(&byte_indices) {

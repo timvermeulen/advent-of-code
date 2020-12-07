@@ -8,7 +8,11 @@ struct Present {
 
 impl Present {
     fn sides(&self) -> (u32, u32, u32) {
-        (self.length * self.width, self.width * self.height, self.height * self.length)
+        (
+            self.length * self.width,
+            self.width * self.height,
+            self.height * self.length,
+        )
     }
 
     fn wrapping_paper(&self) -> u32 {
@@ -24,8 +28,18 @@ impl Present {
 }
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Present>> {
-    let present = chain((parser::u32(), token('x'), parser::u32(), token('x'), parser::u32()))
-        .map(|(length, _, width, _, height)| Present { length, width, height });
+    let present = chain((
+        parser::u32(),
+        token('x'),
+        parser::u32(),
+        token('x'),
+        parser::u32(),
+    ))
+    .map(|(length, _, width, _, height)| Present {
+        length,
+        width,
+        height,
+    });
     present.collect_sep_by(token('\n'))
 }
 

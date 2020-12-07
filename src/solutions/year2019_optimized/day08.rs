@@ -3,7 +3,11 @@ const HEIGHT: usize = 6;
 const SIZE: usize = WIDTH * HEIGHT;
 
 fn part1(input: &str) -> usize {
-    let layer = input.as_bytes().chunks(SIZE).min_by_key(|l| count(l, b'0')).unwrap();
+    let layer = input
+        .as_bytes()
+        .chunks(SIZE)
+        .min_by_key(|l| count(l, b'0'))
+        .unwrap();
     count(layer, b'1') * count(layer, b'2')
 }
 

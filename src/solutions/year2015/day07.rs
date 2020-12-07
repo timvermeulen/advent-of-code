@@ -57,16 +57,29 @@ impl Source {
 
 fn parser<'a>() -> impl Parser<&'a str, Output = HashMap<Wire, Source>> {
     let value = parser::u16();
-    let wire = satisfy(char::is_alphabetic).skip_many1().recognize().map(str::to_string);
+    let wire = satisfy(char::is_alphabetic)
+        .skip_many1()
+        .recognize()
+        .map(str::to_string);
 
     let s = wire.map(SingleSource::W).or(value.map(SingleSource::V));
 
     let gate = choice((
-        chain((s, string(" AND "), s)).map(|(a, _, b)| Gate::And(a, b)).attempt(),
-        chain((s, string(" OR "), s)).map(|(a, _, b)| Gate::Or(a, b)).attempt(),
-        chain((s, string(" LSHIFT "), value)).map(|(a, _, b)| Gate::Lshift(a, b)).attempt(),
-        chain((s, string(" RSHIFT "), value)).map(|(a, _, b)| Gate::Rshift(a, b)).attempt(),
-        chain((string("NOT "), s)).map(|(_, a)| Gate::Not(a)).attempt(),
+        chain((s, string(" AND "), s))
+            .map(|(a, _, b)| Gate::And(a, b))
+            .attempt(),
+        chain((s, string(" OR "), s))
+            .map(|(a, _, b)| Gate::Or(a, b))
+            .attempt(),
+        chain((s, string(" LSHIFT "), value))
+            .map(|(a, _, b)| Gate::Lshift(a, b))
+            .attempt(),
+        chain((s, string(" RSHIFT "), value))
+            .map(|(a, _, b)| Gate::Rshift(a, b))
+            .attempt(),
+        chain((string("NOT "), s))
+            .map(|(_, a)| Gate::Not(a))
+            .attempt(),
     ));
 
     let source = gate.map(Source::Gate).or(s.map(Source::SingleSource));

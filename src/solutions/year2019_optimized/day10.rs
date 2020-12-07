@@ -14,7 +14,11 @@ struct Asteroids {
 
 impl Asteroids {
     fn new(side_len: usize) -> Self {
-        Self { vec: vec![], grid: vec![false; side_len * side_len], side_len }
+        Self {
+            vec: vec![],
+            grid: vec![false; side_len * side_len],
+            side_len,
+        }
     }
     fn iter(&self) -> impl Iterator<Item = Point> + '_ {
         self.vec.iter().copied()
@@ -37,7 +41,10 @@ struct Grid<T> {
 
 impl<T: Clone> Grid<T> {
     fn new(def: T, side_len: usize) -> Self {
-        Self { vec: vec![def; (side_len * 2 - 1) * (side_len * 2 - 1)], side_len }
+        Self {
+            vec: vec![def; (side_len * 2 - 1) * (side_len * 2 - 1)],
+            side_len,
+        }
     }
 }
 
@@ -69,7 +76,10 @@ fn parse(input: &str) -> Asteroids {
     for (y, line) in input.lines().enumerate() {
         for (x, c) in line.chars().enumerate() {
             if c == '#' {
-                asteroids.insert(Point { x: x as i32, y: y as i32 });
+                asteroids.insert(Point {
+                    x: x as i32,
+                    y: y as i32,
+                });
             }
         }
     }
@@ -92,8 +102,9 @@ fn part1(asteroids: &Asteroids) -> (Point, usize) {
     let max = size as i32 - 1;
     let min = -max;
 
-    let gcd: Vec<i32> =
-        (0..size).flat_map(|y| (0..size).map(move |x| gcd(x as i32, y as i32))).collect();
+    let gcd: Vec<i32> = (0..size)
+        .flat_map(|y| (0..size).map(move |x| gcd(x as i32, y as i32)))
+        .collect();
 
     let mut normalized = Grid::<Point>::new(Point { x: 0, y: 0 }, asteroids.side_len);
     for x in min..=max {
@@ -101,7 +112,10 @@ fn part1(asteroids: &Asteroids) -> (Point, usize) {
             let steps = gcd[x.abs() as usize + y.abs() as usize * size];
             normalized[Point { x, y }] = match steps {
                 0 => Point { x: 0, y: 0 },
-                _ => Point { x: x / steps, y: y / steps },
+                _ => Point {
+                    x: x / steps,
+                    y: y / steps,
+                },
             };
         }
     }
@@ -114,7 +128,10 @@ fn part1(asteroids: &Asteroids) -> (Point, usize) {
         .map(|(p0, i)| {
             let mut count = 0;
             for p1 in asteroids.iter() {
-                let n = normalized[Point { x: p1.x - p0.x, y: p1.y - p0.y }];
+                let n = normalized[Point {
+                    x: p1.x - p0.x,
+                    y: p1.y - p0.y,
+                }];
                 let entry = &mut visible[n];
                 if *entry != i {
                     *entry = i;
@@ -147,7 +164,10 @@ fn part2(asteroids: &Asteroids, laser: Point) -> i32 {
         let dx = p1.x - p0.x;
         let dy = p1.y - p0.y;
         let steps = gcd(dx.abs(), dy.abs());
-        (1..steps).map(move |k| Point { x: p0.x + k * dx / steps, y: p0.y + k * dy / steps })
+        (1..steps).map(move |k| Point {
+            x: p0.x + k * dx / steps,
+            y: p0.y + k * dy / steps,
+        })
     };
 
     let is_visible = |p0, p1| p0 != p1 && points_between(p0, p1).all(|p| !asteroids.contains(p));

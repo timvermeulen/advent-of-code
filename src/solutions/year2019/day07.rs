@@ -9,7 +9,9 @@ fn part1(memory: &[i64]) -> i64 {
         let p = heap.next_permutation()?;
         Some([p[0], p[1], p[2], p[3], p[4]])
     });
-    iter.map(|settings| run_part1(memory, settings)).max().unwrap()
+    iter.map(|settings| run_part1(memory, settings))
+        .max()
+        .unwrap()
 }
 
 fn run_part1(memory: &[i64], settings: [i64; 5]) -> i64 {
@@ -17,7 +19,9 @@ fn run_part1(memory: &[i64], settings: [i64; 5]) -> i64 {
     let amps = [amp(), amp(), amp(), amp(), amp()];
     iter!(amps)
         .zip(&settings)
-        .fold(0, |input, (mut amp, &setting)| amp.step_with_iter(iter!([setting, input])).unwrap())
+        .fold(0, |input, (mut amp, &setting)| {
+            amp.step_with_iter(iter!([setting, input])).unwrap()
+        })
 }
 
 fn part2(memory: &[i64]) -> i64 {
@@ -27,7 +31,9 @@ fn part2(memory: &[i64]) -> i64 {
         let p = heap.next_permutation()?;
         Some([p[0], p[1], p[2], p[3], p[4]])
     });
-    iter.map(|settings| run_part2(memory, settings)).max().unwrap()
+    iter.map(|settings| run_part2(memory, settings))
+        .max()
+        .unwrap()
 }
 
 fn run_part2(memory: &[i64], settings: [i64; 5]) -> i64 {

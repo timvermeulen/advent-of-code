@@ -1,8 +1,14 @@
 use super::*;
 
 fn parse(input: &str) -> Vec<i32> {
-    let number = token('+').optional().followed_by(parser::i32()).map(|(_, x)| x);
-    number.collect_sep_by(token('\n')).parse_to_end(input).unwrap()
+    let number = token('+')
+        .optional()
+        .followed_by(parser::i32())
+        .map(|(_, x)| x);
+    number
+        .collect_sep_by(token('\n'))
+        .parse_to_end(input)
+        .unwrap()
 }
 
 fn part1(frequencies: &[i32]) -> i32 {

@@ -4,10 +4,19 @@ use std::cmp;
 pub fn solve(input: &str) -> (i32, i32) {
     let garbage = parser::satisfy(|c: char| c != '-' && !c.is_numeric()).skip_many();
     let property = garbage.followed_by(parser::i32()).map(|(_, x)| x);
-    let ingredient = property
-        .many(|iter| Some([iter.next()?, iter.next()?, iter.next()?, iter.next()?, iter.next()?]));
+    let ingredient = property.many(|iter| {
+        Some([
+            iter.next()?,
+            iter.next()?,
+            iter.next()?,
+            iter.next()?,
+            iter.next()?,
+        ])
+    });
     let properties: [[i32; 5]; 4] = ingredient
-        .sep_by(token('\n'), |iter| Some([iter.next()?, iter.next()?, iter.next()?, iter.next()?]))
+        .sep_by(token('\n'), |iter| {
+            Some([iter.next()?, iter.next()?, iter.next()?, iter.next()?])
+        })
         .parse_to_end(input)
         .unwrap();
 

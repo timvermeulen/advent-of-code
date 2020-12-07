@@ -4,7 +4,10 @@ use permutohedron::Heap;
 
 fn parse<'a>(input: &str) -> Vec<Vec<u32>> {
     let no_digit = satisfy(|c: char| !c.is_digit(10));
-    let line = no_digit.skip_many().followed_by(parser::u32()).map(|(_, n)| n);
+    let line = no_digit
+        .skip_many()
+        .followed_by(parser::u32())
+        .map(|(_, n)| n);
     let lines = line.collect_sep_by(token('\n'));
     let distances: Vec<_> = lines.parse_to_end(input).unwrap();
     let n = reverse_triangle(distances.len()).unwrap();

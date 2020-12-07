@@ -61,8 +61,12 @@ fn parser<'a>() -> impl Parser<&'a str, Output = [Wire; 2]> {
         token('L').map(|_| Direction::Left),
         token('U').map(|_| Direction::Up),
     ));
-    let segment = dir.followed_by(parser::u32()).map(|(dir, len)| Segment { dir, len });
-    let wire = segment.collect_sep_by(comma()).map(|segments| Wire { segments });
+    let segment = dir
+        .followed_by(parser::u32())
+        .map(|(dir, len)| Segment { dir, len });
+    let wire = segment
+        .collect_sep_by(comma())
+        .map(|segments| Wire { segments });
     chain((wire, newline(), wire)).map(|(a, _, b)| [a, b])
 }
 

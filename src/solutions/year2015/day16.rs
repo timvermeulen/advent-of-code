@@ -13,17 +13,25 @@ struct Sue<'a> {
 }
 
 fn parser<'a>() -> impl Parser<&'a str, Output = Vec<Sue<'a>>> {
-    let item =
-        chain((satisfy(char::is_alphabetic).skip_many1().recognize(), string(": "), parser::u32()))
-            .map(|(name, _, count)| Item { name, count });
-    let items = item.sep_by(string(", "), |iter| Some([iter.next()?, iter.next()?, iter.next()?]));
+    let item = chain((
+        satisfy(char::is_alphabetic).skip_many1().recognize(),
+        string(": "),
+        parser::u32(),
+    ))
+    .map(|(name, _, count)| Item { name, count });
+    let items = item.sep_by(string(", "), |iter| {
+        Some([iter.next()?, iter.next()?, iter.next()?])
+    });
     let sue = chain((string("Sue "), parser::u32(), string(": "), items))
         .map(|(_, number, _, items)| Sue { number, items });
     sue.collect_sep_by(token('\n'))
 }
 
 fn part1(sues: &[Sue<'_>]) -> u32 {
-    sues.iter().find(|sue| sue.items.iter().copied().all(is_match_1)).unwrap().number
+    sues.iter()
+        .find(|sue| sue.items.iter().copied().all(is_match_1))
+        .unwrap()
+        .number
 }
 
 fn is_match_1(item: Item<'_>) -> bool {
@@ -44,7 +52,10 @@ fn is_match_1(item: Item<'_>) -> bool {
 }
 
 fn part2(sues: &[Sue<'_>]) -> u32 {
-    sues.iter().find(|sue| sue.items.iter().copied().all(is_match_2)).unwrap().number
+    sues.iter()
+        .find(|sue| sue.items.iter().copied().all(is_match_2))
+        .unwrap()
+        .number
 }
 
 fn is_match_2(item: Item<'_>) -> bool {

@@ -2,7 +2,10 @@ use super::*;
 
 pub fn part2(input: &str) -> i32 {
     let width = input.bytes().position(|b| b == b'\n').unwrap();
-    let entrance = Pos { x: width as i32 / 2, y: width as i32 / 2 };
+    let entrance = Pos {
+        x: width as i32 / 2,
+        y: width as i32 / 2,
+    };
 
     let char_at = |Pos { x, y }| input.as_bytes()[x as usize + y as usize * (width + 1)];
     let is_wall = |pos| char_at(pos) == b'#' || pos.manhattan_distance(entrance) == 1;
@@ -11,7 +14,10 @@ pub fn part2(input: &str) -> i32 {
     let mut stack = Vec::new();
 
     for &(dx, dy) in &[(-1, -1), (-1, 1), (1, -1), (1, 1)] {
-        let entrance = Pos { x: entrance.x + dx, y: entrance.y + dy };
+        let entrance = Pos {
+            x: entrance.x + dx,
+            y: entrance.y + dy,
+        };
 
         let mut max_dist = 0;
         let mut prev_dist = 0;

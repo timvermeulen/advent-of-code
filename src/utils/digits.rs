@@ -26,6 +26,8 @@ pub fn digits(n: u32) -> impl Iterator<Item = u32> {
 }
 
 pub fn digits_len(n: u32, len: u32) -> impl Iterator<Item = u32> {
-    let rev = inf_rev_digits(n).take(len as usize).fold(0, |k, d| 10 * k + d);
+    let rev = inf_rev_digits(n)
+        .take(len as usize)
+        .fold(0, |k, d| 10 * k + d);
     inf_rev_digits(rev).take(len as usize)
 }

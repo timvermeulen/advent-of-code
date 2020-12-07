@@ -16,7 +16,10 @@ pub struct Grid<T> {
 
 impl<T: Clone> Grid<T> {
     pub fn new(default: T) -> Self {
-        Self { default, elements: HashMap::new() }
+        Self {
+            default,
+            elements: HashMap::new(),
+        }
     }
 
     pub fn iter(&self) -> impl Iterator<Item = (Pos, &T)> {
