@@ -26,5 +26,6 @@ pub mod search_algs {
 // pub mod year2018;
 pub mod year2019;
 pub mod year2019_optimized;
+pub mod year2020;
 
 mod bench;
