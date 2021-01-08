@@ -4,6 +4,8 @@ pub fn solve(input: &str) -> (u32, u32) {
 }
 
 fn part1(target: u32) -> u32 {
+    let target = target / 10;
+
     for i in (0..).step_by(2 * 2 * 2 * 2 * 3 * 3 * 5).skip(1) {
         let mut divisor_sum = 1;
         let mut rem = i;
@@ -21,7 +23,7 @@ fn part1(target: u32) -> u32 {
             divisor_sum *= sum;
         }
 
-        if divisor_sum * 10 >= target {
+        if divisor_sum >= target {
             return i;
         }
     }
@@ -54,4 +56,18 @@ async fn test() -> Result<(), InputError> {
     let input = get_input(2015, 20).await?;
     assert_eq!(solve(&input), (665_280, 705_600));
     Ok(())
+}
+
+#[cfg(test)]
+mod benches {
+    extern crate test;
+
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn bench(b: &mut Bencher) {
+        let input = futures::executor::block_on(get_input(2015, 20)).unwrap();
+        b.iter(|| solve(&input));
+    }
 }
